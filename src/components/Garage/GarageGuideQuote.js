@@ -35,27 +35,22 @@ const GuidePrice = (props) => {
 };
 
 class RequestCallbackForm extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            name: "",
-            phone: ""
-        }
-        this.onSubmit = this.onSubmit.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-    }
+    state = {
+        name: this.props.user?this.props.user.display_name:"",
+        phone: ""
+    };
 
-    onSubmit() {
+    onSubmit = () => {
         this.props.onSubmitRequestCallbackForm(this.state.name, this.state.phone);
-    }
+    };
 
-    handleChange(event) {
+    handleChange = (event) => {
         const name = event.target.name;
         const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
         this.setState({
             [name]: value
         })
-    }
+    };
 
     render() {
         return <div className="guide-price">
@@ -72,11 +67,11 @@ class RequestCallbackForm extends React.Component {
                     {!this.props.requestCallbackFormReceived && (
                     <form onSubmit={this.onSubmit}>
                         <div className="form-group">
-                            <input type="text" name="name" value={this.state.name} onChange={this.handleChange}
+                            <input className="form-control" type="text" name="name" value={this.state.name} onChange={this.handleChange}
                                    placeholder="Name"/>
                         </div>
                         <div className="form-group">
-                            <input type="phone" name="phone" value={this.state.phone} onChange={this.handleChange}
+                            <input className="form-control" type="phone" name="phone" value={this.state.phone} onChange={this.handleChange}
                                    placeholder="Phone number"/>
                         </div>
                         <div className="form-group">
@@ -94,30 +89,19 @@ class RequestCallbackForm extends React.Component {
 };
 
 class GarageGuideQuote extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            requestCallbackClicked: false,
-            requestCallbackFormReceived: false,
-        }
-        this.onClickRequestCallback = this.onClickRequestCallback.bind(this);
-        this.onSubmitRequestCallbackForm = this.onSubmitRequestCallbackForm.bind(this);
-    }
+    state = {
+        requestCallbackClicked: false,
+        requestCallbackFormReceived: false,
+    };
 
-    componentDidMount() {
-
-    }
-    getUserId() {
-        return this.props.user_id?this.props.user_id:window.osv_react_wp.user_id;
-    }
-    onSubmitRequestCallbackForm(name, phone) {
-        this.props.requestCallback(this.getUserId(), name, phone);
+    onSubmitRequestCallbackForm = (name, phone) => {
+        this.props.requestCallback(name, phone);
         this.setState({ requestCallbackFormReceived: true});
-    }
+    };
 
-    onClickRequestCallback() {
+    onClickRequestCallback = () => {
         this.setState({requestCallbackClicked: true});
-    }
+    };
 
     render() {
         const q = this.props.guideQuote;
@@ -125,7 +109,7 @@ class GarageGuideQuote extends React.Component {
 
         let right = null;
         if (this.state.requestCallbackClicked) {
-            right = <RequestCallbackForm guideQuote={q} onSubmitRequestCallbackForm={this.onSubmitRequestCallbackForm} requestCallbackFormReceived={this.state.requestCallbackFormReceived} />;
+            right = <RequestCallbackForm user={this.props.user} guideQuote={q} onSubmitRequestCallbackForm={this.onSubmitRequestCallbackForm} requestCallbackFormReceived={this.state.requestCallbackFormReceived} />;
         } else {
             right = <GuidePrice guideQuote={q} onClickRequestCallback={this.onClickRequestCallback}/>;
         }
@@ -151,9 +135,10 @@ class GarageGuideQuote extends React.Component {
 
 const mapStateToProps = state => {
     return {
-        selectedGarageGuideQuote: state.selectedGarageGuideQuote
+        selectedGarageGuideQuote: state.selectedGarageGuideQuote,
+        user: state.auth.user?state.auth.user:null
     };
-}
+};
 
 export default connect(
     mapStateToProps,

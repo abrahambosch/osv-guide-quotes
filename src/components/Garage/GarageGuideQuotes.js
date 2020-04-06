@@ -1,5 +1,5 @@
 import React from 'react';
-import { getGarageItems, selectGarageGuideQuote, deselectGarageGuideQuote } from '../../actions';
+import { getGarageItems, selectGarageGuideQuote, deselectGarageGuideQuote, removeGarageItem } from '../../actions';
 import { connect } from 'react-redux';
 import GarageGuideQuote from './GarageGuideQuote';
 
@@ -10,7 +10,13 @@ class GarageGuideQuotes extends React.Component {
         this.removeGarageItem = this.removeGarageItem.bind(this);
     }
     componentDidMount() {
-        this.props.getGarageItems(this.getUserId());
+        this.props.getGarageItems();
+    }
+    componentDidUpdate(prevProps) {
+        // Typical usage (don't forget to compare props):
+        if (this.props.user_id !== prevProps.user_id) {
+            this.props.getGarageItems();
+        }
     }
 
     viewGarageItem(item) {
@@ -19,9 +25,10 @@ class GarageGuideQuotes extends React.Component {
     }
     removeGarageItem(item) {
         console.log("removeGarageItem", item);
-    }
-    getUserId() {
-        return this.props.user_id?this.props.user_id:window.osv_react_wp.user_id;
+
+        if (window.confirm("are you sure you want to remove this item?\nItem: "+item.rate_book.name)) {
+            this.props.removeGarageItem(item);
+        }
     }
 
     render() {
@@ -79,11 +86,12 @@ class GarageGuideQuotes extends React.Component {
 const mapStateToProps = state => {
     return {
         garageGuideQuotes: state.garageGuideQuotes,
-        selectedGarageGuideQuote: state.selectedGarageGuideQuote
+        selectedGarageGuideQuote: state.selectedGarageGuideQuote,
+        user_id: state.auth.user?state.auth.user.user_id:''
     };
 }
 
 export default connect(
     mapStateToProps,
-    { getGarageItems, selectGarageGuideQuote, deselectGarageGuideQuote }
+    { getGarageItems, selectGarageGuideQuote, deselectGarageGuideQuote, removeGarageItem }
 )(GarageGuideQuotes);

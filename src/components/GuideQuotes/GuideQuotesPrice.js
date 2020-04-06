@@ -1,7 +1,6 @@
 import React from 'react';
-import axios from 'axios';
-
-//import Modal from 'react-modal';
+import { connect } from 'react-redux';
+import { createUser, createGarageItem, requestCallback } from '../../actions';
 
 
 let api_url = "https://api.osv.ltd.uk";
@@ -53,100 +52,96 @@ function getErrorFromAxiosError(error) {
 
 
 class GuideQuotesPrice extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            api_url: this.props.api_url?this.props.api_url:api_url,
-            errors: [],
-            name: this.props.name,
-            email: this.props.email,
-            phone: this.props.phone,
-            consent: "",
-            seomake: this.props.seomake,
-            seomodel: this.props.seomodel,
-            password: "",
-            passwordConfirm: "",
-            saveToGarageButtonClicked: false,
-            garageItem: null
-        };
-        this.onSubmitCreateUser = this.onSubmitCreateUser.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-        this.reportError = this.reportError.bind(this);
-        this.onClickSaveToGarage = this.onClickSaveToGarage.bind(this);
-        this.addToGarage = this.addToGarage.bind(this);
-    }
+    state = {
+        api_url: this.props.api_url ? this.props.api_url : api_url,
+        errors: [],
+        name: this.props.name,
+        email: this.props.email,
+        phone: this.props.phone,
+        consent: "",
+        seomake: this.props.seomake,
+        seomodel: this.props.seomodel,
+        password: "",
+        passwordConfirm: "",
+        saveToGarageButtonClicked: false,
+        requestCallbackReceived: false,
+        garageItem: null
+    };
 
-    reportError(error) {
+    reportError = (error) => {
         error = getErrorFromAxiosError(error);
         this.setState((state, props) => {
             let errors = [...state.errors, error];
             return {errors};
         });
-    }
-    removeError(i) {
+    };
+
+    removeError = (i) => {
         console.log("removing error: ", i);
         let errors = this.state.errors.filter((item, j) => {
-            if (i!=j) return true;
+            if (i != j) return true;
             return false;
         });
         this.setState({errors});
-    }
-    onSubmitCreateUser(e) {
+    };
+
+    onSubmitCreateUser = (e) => {
         e.preventDefault();
         console.log("onSubmit: ", this.state);
         //this.setState({selectedTab})
         let {name, phone, email, password} = this.state;
         phone = phone.replace(/[^0-9]/g, "");
-
-        let data = {name, phone, email, password};
-        console.log("creating account: ", data);
-        this.props.createUser(name, phone, email, password).then((response) => {
-            console.log(response);
-            if (response.data.data.user) {
-                this.addToGarage();
-            }
-        }).catch((error) => {
-            console.log(error);
-            this.reportError(error);
+        this.props.createUser(name, phone, email, password, (error, user) =>{
+            this.addToGarage(user);
         });
-    }
+    };
 
 
-    handleChange(event) {
+    handleChange = (event) => {
         const name = event.target.name;
         const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
         this.setState({
             [name]: value
         })
-    }
+    };
 
-    onClickSaveToGarage(e) {
+    onClickSaveToGarage = (e) => {
         e.preventDefault();
         if (this.props.user) {
-            this.addToGarage();
-        }
-        else {
+            this.addToGarage(this.props.user);
+        } else {
             this.setState({saveToGarageButtonClicked: true});
         }
-    }
+    };
 
-    addToGarage() {
+    addToGarage = (user) => {
+        if (!user) user = this.props.user;
         let {seomake, seomodel} = this.state;
-        let {user, rateBook} = this.props;
-        let data = {user_id: user.ID, seomake, seomodel, rateBookId: rateBook.id};
+        let { rateBook} = this.props;
+        let data = {user_id: user.user_id, seomake, seomodel, rateBookId: rateBook.id};
         console.log("submitting quote: ", data);
-        this.props.createGarageItem(data.user_id, data.seomake, data.seomodel, data.rateBookId).then((response) => {
-            console.log(response);
+        this.props.createGarageItem(user.user_id, data.seomake, data.seomodel, data.rateBookId, (error, response) => {
+            if (error) {
+                this.reportError(error);
+            }
+            else {
+                console.log(response);
+                this.setState({saveToGarageButtonClicked: true});
+            }
+        });
+    };
 
-        }).catch((error) => {
-            console.log(error);
-            this.reportError(error);
+    requestOfficialQuote = () => {
+        const { name, phone } = this.state;
+        const rate_books_id = this.props.rateBook.id;
+        this.props.requestCallback(name, phone, rate_books_id, (error, response) => {
+            if (!error) {
+                this.setState({requestCallbackReceived: true});
+            }
         });
     }
 
-    componentDidMount() {
 
-    }
     render() {
         let {user, rateBook} = this.props;
 
@@ -185,57 +180,78 @@ class GuideQuotesPrice extends React.Component {
             return n;
         }
 
-            return (
-                <div className="guide-price">
-                    <div className="guide-price-box">
-                        <h2>Guide Price</h2>
-                        <div className={"guide-price-price"}>
-                            £{nf(rateBook.monthly_price)} + VAT * per month
-                        </div>
-                        <div className="guide-price-body">
-                            Based on {nf(rateBook.mileage)} per year<br/>
-                            £{nf(rateBook.initial_payment)} + VAT initial payment<br/>
-                            {rateBook.contract_length} month contract<br/>
-                            {rateBook.contract_term}
-                        </div>
-                        {(this.state.saveToGarageButtonClicked &&  !this.props.user) && (
-                            <form onSubmit={this.onSubmitCreateUser}>
-                                <div className="form-group">
-                                    <label>Please create a password:</label>
-                                    <input type="password" name="password" value={this.state.password} onChange={this.handleChange} />
-                                </div>
-                                <div className="form-group">
-                                    <label>Please confirm a password:</label>
-                                    <input type="password" name="passwordConfirm" value={this.state.passwordConfirm} onChange={this.handleChange} />
-                                </div>
-                                <div>
-                                    <button type="submit" className="btn">Create Garage</button>
-                                </div>
-                            </form>
-                        )}
-                        {(this.state.saveToGarageButtonClicked && this.props.user) && (
-                            <a href="#garage" className="btn">See this in your garage</a>
-                        )}
-
-                        {!this.state.saveToGarageButtonClicked && (
-                            <div>
-                                <button className="btn" onClick={this.onClickSaveToGarage} >Save to my garage</button>
+        return (
+            <div className="guide-price">
+                <div className="guide-price-box">
+                    <h2>Guide Price</h2>
+                    <div className={"guide-price-price"}>
+                        £{nf(rateBook.monthly_price)} + VAT * per month
+                    </div>
+                    <div className="guide-price-body">
+                        Based on {nf(rateBook.mileage)} per year<br/>
+                        £{nf(rateBook.initial_payment)} + VAT initial payment<br/>
+                        {rateBook.contract_length} month contract<br/>
+                        {rateBook.contract_term}
+                    </div>
+                    {(this.state.saveToGarageButtonClicked && !this.props.user) && (
+                        <form onSubmit={this.onSubmitCreateUser}>
+                            <div className="form-group">
+                                <label>Please create a password:</label>
+                                <input type="password" name="password" value={this.state.password}
+                                       onChange={this.handleChange}/>
                             </div>
-                        )}
+                            <div className="form-group">
+                                <label>Please confirm a password:</label>
+                                <input type="password" name="passwordConfirm" value={this.state.passwordConfirm}
+                                       onChange={this.handleChange}/>
+                            </div>
+                            <div>
+                                <button type="submit" className="btn">Create Garage</button>
+                            </div>
+                        </form>
+                    )}
+                    {(this.state.saveToGarageButtonClicked && this.props.user) && (
+                        <a href="/garage" className="btn">See this in your garage</a>
+                    )}
+
+                    {!this.state.saveToGarageButtonClicked && (
+                        <div>
+                            <button className="btn" onClick={this.onClickSaveToGarage}>Save to my garage</button>
+                        </div>
+                    )}
+
+                    {this.props.user && <div>
                         <div>
                             Need to tailor this quote to meet your requirements?
                         </div>
-                        <div>
-                            <button className="btn" onClick={this.requestOfficialQuote} >Request Official Quote</button>
-                        </div>
-                    </div>
-                    <div className="small">*pricing is subject to availability. T&amp;C's and the above contract conditions</div>
+                        {!this.state.requestCallbackReceived && <div>
+                            <button className="btn" onClick={this.requestOfficialQuote}>Request Official Quote</button>
+                        </div>}
+                        {this.state.requestCallbackReceived && <div>
+                            <h3>Request Received. </h3>
+                            A team member will be in contact with you.
+                        </div>}
+                    </div>}
                 </div>
-            );
-
-
+                <div className="small">*pricing is subject to availability. T&amp;C's and the above contract
+                    conditions
+                </div>
+            </div>
+        );
     }
 }
 
+const mapStateToProps = (state) => {
+    return {
+        auth: state.auth,
+        user: state.auth && state.auth.user,
+        callbackRequests: state.callbackRequests,
+        garageGuideQuotes: state.garageGuideQuotes
+    }
+};
 
-export default GuideQuotesPrice;
+export default connect(mapStateToProps, {
+    createUser,
+    createGarageItem,
+    requestCallback
+})(GuideQuotesPrice);

@@ -1,5 +1,4 @@
 import React from 'react';
-import RateBookRow from './RateBookRow';
 
 class RateBookUploadList extends React.Component {
     componentDidMount() {
@@ -16,13 +15,13 @@ class RateBookUploadList extends React.Component {
                 <td>{item.active}</td>
                 <td><button
                     onClick={(e) => {e.preventDefault(); this.props.onSelectedRateBookUpload(item)}}
-                    className="btn"
+                    className="btn btn-xs btn-info"
                 >View</button></td>
                 <td></td>
             </tr>
         ));
         return (<div>
-            <table className="table">
+            <table className="table table-hover">
                 <thead>
                 <tr>
                     <th>Name</th>
@@ -30,7 +29,7 @@ class RateBookUploadList extends React.Component {
                     <th>Filename</th>
                     <th>Expiration</th>
                     <th>Active</th>
-                    <th><button onClick={this.props.onClickedNewRateBookUpload} className="btn">New</button></th>
+                    <th><button onClick={this.props.onClickedNewRateBookUpload} className="btn btn-xs btn-primary">New</button></th>
                     <th></th>
                 </tr>
                 </thead>

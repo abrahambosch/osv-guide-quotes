@@ -2,6 +2,8 @@ import React from 'react';
 import axios from 'axios';
 import GuideQuotesPrice from "./GuideQuotesPrice";
 
+//import { connect } from 'react-redux';
+
 //import Modal from 'react-modal';
 
 
@@ -13,6 +15,7 @@ if (window.location.hostname === 'localhost' || window.location.hostname === 'st
 function formatErrors(obj) {
     let items = [];
     let i = 0;
+    if (typeof obj === 'string') obj = {error: obj};
     for (const n in obj) {
         let v = arrayToString(obj[n]);
         items.push(<div key={i}><b>{n}:</b> {v}</div>);
@@ -54,38 +57,30 @@ function getErrorFromAxiosError(error) {
 
 
 class GuideQuotes extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            api_url: this.props.api_url?this.props.api_url:api_url,
-            errors: [],
-            name: "",
-            email: "",
-            phone: "",
-            consent: "",
-            seomake: this.props.seomake,
-            seomodel: this.props.seomodel,
-            showSuccess: false,
-            rateBook: null,
-            garageItems: [],
-            user: null
-        };
-        this.onSubmit = this.onSubmit.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-        this.reportError = this.reportError.bind(this);
-        this.requestOfficialQuote = this.requestOfficialQuote.bind(this);
-        this.createUser = this.createUser.bind(this);
-        this.createGarageItem = this.createGarageItem.bind(this);
-    }
+    state = {
+        api_url: this.props.api_url?this.props.api_url:api_url,
+        errors: [],
+        name: this.props.user?this.props.user.display_name:"",
+        email: this.props.user?this.props.user.user_email:"",
+        phone: "",
+        consent: "",
+        seomake: this.props.seomake,
+        seomodel: this.props.seomodel,
+        showSuccess: false,
+        rateBook: null,
+        garageItems: [],
+        user: null
+    };
 
-    reportError(error) {
+    reportError = (error) => {
         error = getErrorFromAxiosError(error);
         this.setState((state, props) => {
             let errors = [...state.errors, error];
             return {errors};
         });
     }
-    removeError(i) {
+
+    removeError = (i) => {
         console.log("removing error: ", i);
         let errors = this.state.errors.filter((item, j) => {
             if (i!=j) return true;
@@ -93,7 +88,8 @@ class GuideQuotes extends React.Component {
         });
         this.setState({errors});
     }
-    onSubmit(e) {
+
+    onSubmit = (e) => {
         e.preventDefault();
         console.log("onSubmit: ", this.state);
         //this.setState({selectedTab})
@@ -112,38 +108,11 @@ class GuideQuotes extends React.Component {
         });
     }
 
-    createUser(name, phone, email, password) {
-        phone = phone.replace(/[^0-9]/g, "");
-        let data = {name, phone, email, password};
-        console.log("creating account: ", data);
-        return axios.post(this.state.api_url + '/wpusers', data).then((response) => {
-            console.log(response);
-            if (response.data.data.user) {
-                this.setState({user: response.data.data.user}, () => {
 
-                })
-            }
-        }).catch((error) => {
-            console.log(error);
-            this.reportError(error);
-        });
-    }
 
-    createGarageItem(user_id, seomake, seomodel, rateBookId) {
-        let data = {user_id, seomake, seomodel, rateBookId};
-        console.log("submitting quote: ", data);
-        return axios.post(this.state.api_url + '/garages/'+data.user_id+ '/addVehicle', data).then((response) => {
-            console.log(response);
-            if (response.data.data.garageItems) {
-                this.setState({garageItems: response.data.data.garageItems})
-            }
-        }).catch((error) => {
-            console.log(error);
-            this.reportError(error);
-        });
-    }
 
-    handleChange(event) {
+
+    handleChange = (event) => {
         const name = event.target.name;
         const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
         this.setState({
@@ -151,13 +120,20 @@ class GuideQuotes extends React.Component {
         })
     }
 
-    requestOfficialQuote(e) {
-        e.preventDefault();
+
+    componentDidUpdate(prevProps) {
+        if (this.props.user !== prevProps.user) {
+            if (!this.state.name && !this.state.email) {
+                this.setState({
+                    name: this.props.user.display_name,
+                    email: this.props.user.user_email
+                })
+
+            }
+        }
     }
 
-    componentDidMount() {
 
-    }
     render() {
         let errors = this.state.errors.map((item, i) => {
             item = formatErrors(item);
@@ -201,9 +177,6 @@ class GuideQuotes extends React.Component {
                     phone={this.state.phone}
                     rateBook={this.state.rateBook}
                     garageItems={this.state.garageItems}
-                    user={this.state.user}
-                    createUser={this.createUser}
-                    createGarageItem={this.createGarageItem}
                 ></GuideQuotesPrice>
             );
         }
@@ -264,5 +237,13 @@ class GuideQuotes extends React.Component {
     }
 }
 
+const mapStateToProps = (state) => {
+    return {
+        auth: state.auth,
+        user: state.auth && state.auth.user,
+        callbackRequests: state.callbackRequests,
+        garageGuideQuotes: state.garageGuideQuotes
+    }
+}
 
 export default GuideQuotes;

@@ -2,11 +2,15 @@ import { combineReducers } from 'redux';
 import garageGuideQuotesReducer from './garageGuideQuotesReducer';
 import garageOfficialQuotesReducer from './garageOfficialQuotesReducer';
 import selectedGarageGuideQuoteReducer from './selectedGarageGuideQuoteReducer';
-import userReducer from './userReducer';
+import callbackRequestsReducer from "./callbackRequestsReducer";
+import authReducer from './authReducer';
+import { reducer as formReducer } from 'redux-form';
 
 export default combineReducers({
+    callbackRequests: callbackRequestsReducer,
     garageGuideQuotes: garageGuideQuotesReducer,
     garageOfficialQuotes: garageOfficialQuotesReducer,
-    user: userReducer,
-    selectedGarageGuideQuote: selectedGarageGuideQuoteReducer
+    auth: authReducer,
+    selectedGarageGuideQuote: selectedGarageGuideQuoteReducer,
+    form: formReducer
 });

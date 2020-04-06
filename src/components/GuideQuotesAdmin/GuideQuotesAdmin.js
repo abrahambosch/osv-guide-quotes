@@ -118,6 +118,7 @@ class GuideQuotesAdmin extends React.Component {
             console.log(response);
             this.reloadLists();
             this.loadRateBookUploads();
+            this.setState({rateBookUploadModalShow: false});
         }).catch((error) => {
             console.log(error);
             this.reportError(error);

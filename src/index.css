@@ -64,6 +64,18 @@ label {
   margin-right: 15px;
 }
 
+
 .request-guide-price input, .guide-price input {
-  width: 100%;
+  width: 100% !important;
+}
+
+.osv-login-button-wrapper {
+  position: relative;
+}
+.osv-login-button-form {
+  z-index: 10000000;
+  background: #fff;
+  padding: 40px;
+  position: absolute;
+  right: 0;
 }

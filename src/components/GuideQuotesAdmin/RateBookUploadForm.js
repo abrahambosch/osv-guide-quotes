@@ -1,5 +1,4 @@
 import React from 'react';
-import RateBookRow from './RateBookRow';
 
 class RateBookUploadForm extends React.Component {
     componentDidMount() {

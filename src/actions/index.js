@@ -17,7 +17,8 @@ import {
     CREATE_USER_FAILURE
 } from './types';
 
-
+console.log("process.env object", process.env);
+console.log("process cwd", process.cwd());
 
 export const getGarageItems = () => async (dispatch, getState) => {
     console.log("action getGarage");
@@ -25,7 +26,8 @@ export const getGarageItems = () => async (dispatch, getState) => {
     const user_id = getState().auth.user.user_id;
     const apiurl = getState().auth.apiurl;
     const url = apiurl + '/garages/' + user_id;
-    axios.get(url).then(response => {
+    const config = {headers: {'Authorization': 'Bearer ' + this.props.auth.authtoken}};
+    axios.get(url, config).then(response => {
         dispatch({
             type: FETCH_GARAGE_GUIDE_QUOTES,
             payload: response.data.data.garageItems
@@ -38,7 +40,8 @@ export const callbackRequests = () => async (dispatch, getState) => {
     const user_id = getState().auth.user.user_id;
     const apiurl = getState().auth.apiurl;
     const url = apiurl + '/garages/' + user_id + '/callbackRequests';
-    await axios.get(url).then(response => {
+    const config = {headers: {'Authorization': 'Bearer ' + this.props.auth.authtoken}};
+    await axios.get(url, config).then(response => {
         dispatch({
             type: CALLBACK_REQUESTS,
             payload: response.data.data
@@ -57,12 +60,13 @@ export const requestCallback = (name, phone, rate_books_id, callback) => async (
     }
     const garage_items_id = selectedGarageGuideQuote?selectedGarageGuideQuote.id:'';
     const url = apiurl + '/garages/' + user_id + '/callbackRequests';
+    const config = {headers: {'Authorization': 'Bearer ' + this.props.auth.authtoken}};
     await axios.post(url, {
         name,
         phone,
         garage_items_id,
         rate_books_id
-    }).then(response => {
+    }, config).then(response => {
         dispatch({
             type: CALLBACK_REQUEST,
             payload: response.data.data
@@ -100,7 +104,8 @@ export const createUser = (name, phone, email, password, callback) => async (dis
     let data = {name, phone, email, password};
     const apiurl = getState().auth.apiurl;
     console.log("creating account: ", data);
-    return axios.post(apiurl + '/wpusers', data).then((response) => {
+    const config = {headers: {'Authorization': 'Bearer ' + this.props.auth.authtoken}};
+    return axios.post(apiurl + '/wpusers', data, config).then((response) => {
         console.log(response);
         if (response.data.data.user) {
             dispatch({ type: CREATE_USER_SUCCESS, payload: response.data.data.user });
@@ -134,7 +139,7 @@ export const attemptLogin = (username, password) => async (dispatch, getState) =
     dispatch(request({ username }));
     await axios.post(url, qs.stringify(data), {
         headers: {
-            Authorization: 'Basic ZGV2ZWxvcDo2bWxCekNNdFA='
+            Authorization: getState().auth.basic_auth
         },
         crossdomain: true
     }).then(response => {
@@ -163,7 +168,8 @@ export const createGarageItem = (user_id, seomake, seomodel, rateBookId, callbac
     console.log("submitting quote: ", data);
     //const user_id = getState().auth.user.user_id;
     const apiurl = getState().auth.apiurl;
-    return axios.post(apiurl + '/garages/'+user_id+ '/addVehicle', data).then((response) => {
+    const config = {headers: {'Authorization': 'Bearer ' + this.props.auth.authtoken}};
+    return axios.post(apiurl + '/garages/'+user_id+ '/addVehicle', data, config).then((response) => {
         console.log(response);
         if (response.data.data.garageItems) {
             dispatch({
@@ -197,7 +203,8 @@ export const removeGarageItem = (garageItem, callback) => async (dispatch, getSt
     console.log("submitting quote: ", garageItem);
     const user_id = getState().auth.user.user_id;
     const apiurl = getState().auth.apiurl;
-    return axios.delete(apiurl + '/garages/'+user_id+ '/garageItems/'+garageItem.id).then((response) => {
+    const config = {headers: {'Authorization': 'Bearer ' + this.props.auth.authtoken}};
+    return axios.delete(apiurl + '/garages/'+user_id+ '/garageItems/'+garageItem.id, config).then((response) => {
         console.log(response);
         if (response.data.data.garageItems) {
             dispatch({

@@ -22,7 +22,9 @@ let initialState = {
     resturl: "/wp-json/osv_react",
     logout_url: "/wp-login.php?action=logout",
     nonce: "",
-    lost_password_url:"/wp-login.php?action=lostpassword"
+    lost_password_url:"/wp-login.php?action=lostpassword",
+    authtoken: "",
+    basic_auth: ""
 };
 if (window.osv_guide_quotes_wp) {
     if (window.osv_guide_quotes_wp.ajaxurl) {
@@ -36,6 +38,9 @@ if (window.osv_guide_quotes_wp) {
     }
     if (window.osv_guide_quotes_wp.logout_url) {
         initialState.logout_url = window.osv_guide_quotes_wp.logout_url;
+    }
+    if (window.osv_guide_quotes_wp.basic_auth) {
+        initialState.basic_auth = window.osv_guide_quotes_wp.basic_auth;
     }
 // let user = JSON.parse(localStorage.getItem('user'));
     if (window.osv_guide_quotes_wp.user) {

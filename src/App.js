@@ -25,9 +25,10 @@ const osv_guide_quotes_wp = {
     "home_url": "https://staging.osv.ltd.uk",
     "logout_url": "https://staging.osv.ltd.uk/wp-login.php?action=logout&_wpnonce=ef8710cf71",
     "lostPasswordUrl": "https://staging.osv.ltd.uk/wp-login.php?action=lostpassword",
-    "loadingmessage": "Sending user info, please wait..."
+    "loadingmessage": "Sending user info, please wait...",
+    "basic_auth": process.env.REACT_APP_basic_auth  // for local testing only.
 };
-
+console.log("process.env", process.env)
 
 window.osv_guide_quotes_wp = window.osv_guide_quotes_wp?window.osv_guide_quotes_wp:osv_guide_quotes_wp;
 

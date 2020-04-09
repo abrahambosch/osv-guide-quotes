@@ -171,6 +171,7 @@ __THIS;
 
     function osv_get_wp()
     {
+
         return [
             'nonce' => wp_create_nonce('ajax-login-nonce'),
             'post_id' => get_the_ID(),
@@ -180,8 +181,15 @@ __THIS;
             'home_url' => home_url(),
             'logout_url' => wp_logout_url('/'),
             'lost_password_url' => wp_lostpassword_url(),
-            'loadingmessage' => __('Sending user info, please wait...')
+            'loadingmessage' => __('Sending user info, please wait...'),
+            'basic_auth' => $this->get_basic_auth()
         ];
+    }
+
+    function get_basic_auth()
+    {
+        $ini_array = parse_ini_file("config.ini");
+        return $ini_array['basic_auth'];
     }
 
     function get_password_reset_url($user_id)

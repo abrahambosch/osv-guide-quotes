@@ -26,7 +26,7 @@ export const getGarageItems = () => async (dispatch, getState) => {
     const user_id = getState().auth.user.user_id;
     const apiurl = getState().auth.apiurl;
     const url = apiurl + '/garages/' + user_id;
-    const config = {headers: {'Authorization': 'Bearer ' + this.props.auth.authtoken}};
+    const config = {headers: {'Authorization': 'Bearer ' + getState().auth.authtoken}};
     axios.get(url, config).then(response => {
         dispatch({
             type: FETCH_GARAGE_GUIDE_QUOTES,
@@ -40,7 +40,7 @@ export const callbackRequests = () => async (dispatch, getState) => {
     const user_id = getState().auth.user.user_id;
     const apiurl = getState().auth.apiurl;
     const url = apiurl + '/garages/' + user_id + '/callbackRequests';
-    const config = {headers: {'Authorization': 'Bearer ' + this.props.auth.authtoken}};
+    const config = {headers: {'Authorization': 'Bearer ' + getState().auth.authtoken}};
     await axios.get(url, config).then(response => {
         dispatch({
             type: CALLBACK_REQUESTS,
@@ -60,7 +60,7 @@ export const requestCallback = (name, phone, rate_books_id, callback) => async (
     }
     const garage_items_id = selectedGarageGuideQuote?selectedGarageGuideQuote.id:'';
     const url = apiurl + '/garages/' + user_id + '/callbackRequests';
-    const config = {headers: {'Authorization': 'Bearer ' + this.props.auth.authtoken}};
+    const config = {headers: {'Authorization': 'Bearer ' + getState().auth.authtoken}};
     await axios.post(url, {
         name,
         phone,
@@ -104,7 +104,7 @@ export const createUser = (name, phone, email, password, callback) => async (dis
     let data = {name, phone, email, password};
     const apiurl = getState().auth.apiurl;
     console.log("creating account: ", data);
-    const config = {headers: {'Authorization': 'Bearer ' + this.props.auth.authtoken}};
+    const config = {headers: {'Authorization': 'Bearer ' + getState().auth.authtoken}};
     return axios.post(apiurl + '/wpusers', data, config).then((response) => {
         console.log(response);
         if (response.data.data.user) {
@@ -168,7 +168,7 @@ export const createGarageItem = (user_id, seomake, seomodel, rateBookId, callbac
     console.log("submitting quote: ", data);
     //const user_id = getState().auth.user.user_id;
     const apiurl = getState().auth.apiurl;
-    const config = {headers: {'Authorization': 'Bearer ' + this.props.auth.authtoken}};
+    const config = {headers: {'Authorization': 'Bearer ' + getState().auth.authtoken}};
     return axios.post(apiurl + '/garages/'+user_id+ '/addVehicle', data, config).then((response) => {
         console.log(response);
         if (response.data.data.garageItems) {
@@ -203,7 +203,7 @@ export const removeGarageItem = (garageItem, callback) => async (dispatch, getSt
     console.log("submitting quote: ", garageItem);
     const user_id = getState().auth.user.user_id;
     const apiurl = getState().auth.apiurl;
-    const config = {headers: {'Authorization': 'Bearer ' + this.props.auth.authtoken}};
+    const config = {headers: {'Authorization': 'Bearer ' + getState().auth.authtoken}};
     return axios.delete(apiurl + '/garages/'+user_id+ '/garageItems/'+garageItem.id, config).then((response) => {
         console.log(response);
         if (response.data.data.garageItems) {

@@ -279,7 +279,7 @@ class RateBookEdit extends React.Component {
                         </div>
                         <div className="col-md-4">
                             <div className="form-group">
-                                <label>monthly_price</label>
+                                <label>Monthly Price</label>
                                 <input
                                     name="monthly_price"
                                     value={this.state.rateBook.monthly_price}
@@ -298,7 +298,7 @@ class RateBookEdit extends React.Component {
                         </div>
                         <div className="col-md-4">
                             <div className="form-group">
-                                <label>initial_payment</label>
+                                <label>Initial Payment</label>
                                 <input
                                     name="initial_payment"
                                     value={this.state.rateBook.initial_payment}
@@ -317,7 +317,7 @@ class RateBookEdit extends React.Component {
                         </div>
                         <div className="col-md-4">
                             <div className="form-group">
-                                <label>contract_length</label>
+                                <label>Contract Length</label>
                                 <input
                                     name="contract_length"
                                     value={this.state.rateBook.contract_length}
@@ -336,7 +336,7 @@ class RateBookEdit extends React.Component {
                         </div>
                         <div className="col-md-4">
                             <div className="form-group">
-                                <label>contract_term</label>
+                                <label>Contract Type</label>
                                 <input
                                     name="contract_term"
                                     value={this.state.rateBook.contract_term}
@@ -355,7 +355,7 @@ class RateBookEdit extends React.Component {
                         </div>
                         <div className="col-md-4">
                             <div className="form-group">
-                                <label>mileage</label>
+                                <label>Mileage</label>
                                 <input
                                     name="mileage"
                                     value={this.state.rateBook.mileage}
@@ -368,7 +368,7 @@ class RateBookEdit extends React.Component {
                     <div className="row">
                         <div className="col-md-8">
                             <div className="form-group">
-                                <label>expiration</label>
+                                <label>Expiration</label>
                                 <input
                                     name="expiration"
                                     value={this.state.rateBook.expiration}
@@ -379,14 +379,12 @@ class RateBookEdit extends React.Component {
                         </div>
                         <div className="col-md-4">
                             <div className="form-group">
-                                <label>active</label>
-                                <input
+                                <label><input
                                     type="checkbox"
                                     name="active"
                                     checked={this.state.rateBook.active}
                                     onChange={this.handleChange}
-                                    className="form-control"
-                                />
+                                /> Active</label>
                             </div>
                         </div>
                     </div>

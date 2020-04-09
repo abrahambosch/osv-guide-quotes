@@ -92,6 +92,7 @@ class GuideQuotesPrice extends React.Component {
         let {name, phone, email, password} = this.state;
         phone = phone.replace(/[^0-9]/g, "");
         this.props.createUser(name, phone, email, password, (error, user) =>{
+            console.log("created a user. ", user);
             this.addToGarage(user);
         });
     };
@@ -188,7 +189,7 @@ class GuideQuotesPrice extends React.Component {
                         £{nf(rateBook.monthly_price)} + VAT * per month
                     </div>
                     <div className="guide-price-body">
-                        Based on {nf(rateBook.mileage)} per year<br/>
+                        Based on {nf(rateBook.mileage)} miles per year<br/>
                         £{nf(rateBook.initial_payment)} + VAT initial payment<br/>
                         {rateBook.contract_length} month contract<br/>
                         {rateBook.contract_term}

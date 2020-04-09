@@ -27,7 +27,7 @@ class RateBookUploadList extends React.Component {
                     <th>Name</th>
                     <th>Description</th>
                     <th>Filename</th>
-                    <th>Expiration</th>
+                    <th>Expiry</th>
                     <th>Active</th>
                     <th><button onClick={this.props.onClickedNewRateBookUpload} className="btn btn-xs btn-primary">New</button></th>
                     <th></th>

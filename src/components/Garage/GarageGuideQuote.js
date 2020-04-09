@@ -23,7 +23,7 @@ const GuidePrice = (props) => {
                 {rateBook.contract_term}
             </div>
             <div>
-                Ready to secure your
+                Want an official quote?
             </div>
             <div>
                 <button className="btn" onClick={props.onClickRequestCallback}>Request a call back</button>
@@ -62,7 +62,7 @@ class RequestCallbackForm extends React.Component {
 
                 <div className="guide-price-body">
                     {this.props.requestCallbackFormReceived && (
-                        <div><h3>Thank you, request received.</h3></div>
+                        <div><h3>Thank you, your official quote request has been received. One of our vehicle specialists will be calling you within 24 hours.</h3></div>
                     )}
                     {!this.props.requestCallbackFormReceived && (
                     <form onSubmit={this.onSubmit}>

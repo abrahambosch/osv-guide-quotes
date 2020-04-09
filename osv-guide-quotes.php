@@ -23,7 +23,6 @@ class OsvGuideQuotesAdmin
     }
 
 
-
     public function admin_menu()
     {
         add_menu_page('OSV Guide Quotes', 'OSV Guide Quotes', 'manage_options', $this->slug, [$this, 'index_page'],
@@ -42,8 +41,6 @@ class OsvGuideQuotesAdmin
 
     public function index_page()
     {
-        $this->printBootstrap();
-
         echo <<<__THIS
 <div id='osv-guide-quotes-admin'>Guide Quotes Admin</div>
 __THIS;
@@ -57,6 +54,12 @@ __THIS;
         add_action('wp_ajax_osvajaxlogin', [$this, 'osv_ajax_login']);
         add_action('wp_enqueue_scripts', [$this, "osv_react_enqueue_scripts"]);
         add_action('admin_enqueue_scripts', [$this, "osv_react_enqueue_scripts"]);
+        add_action('admin_enqueue_scripts', [$this, "osv_admin_scripts"]);
+
+        add_action('show_user_profile', [$this, 'my_show_extra_profile_fields']);
+        add_action('edit_user_profile', [$this, 'my_show_extra_profile_fields']);
+        add_action('personal_options_update', [$this, 'my_save_extra_profile_fields']);
+        add_action('edit_user_profile_update', [$this, 'my_save_extra_profile_fields']);
 
         add_action('init', function () {
 
@@ -70,42 +73,39 @@ __THIS;
             }, 10, 2);
 
             add_shortcode('osv-guide-quotes-admin', function ($atts) {
-                $default_atts = array(
-                    'user_id' => get_current_user_id()
-                );
+                $default_atts = array();
                 $args = shortcode_atts($default_atts, $atts);
-                return "<div id='osv-guide-quotes-admin' data-user_id='{$args['user_id']}'></div>";
+                return "<div id='osv-guide-quotes-admin'></div>";
             });
 
             add_shortcode('osv-garage', function ($atts) {
-                $default_atts = array(
-                    'user_id' => get_current_user_id()
-                );
+                $default_atts = array();
                 $args = shortcode_atts($default_atts, $atts);
-                return "<div id='osv-garage' data-user_id='{$args['user_id']}'></div>";
+                return "<div id='osv-garage'></div>";
             });
 
             // do_shortcode('[osv-login-button]');
             add_shortcode('osv-login-button', function ($atts) {
-                $default_atts = array(
-                    'user_id' => get_current_user_id()
-                );
+                $default_atts = array();
                 $args = shortcode_atts($default_atts, $atts);
-                return "<div id='osv-login-button' data-user_id='{$args['user_id']}'></div>";
+                return "<div id='osv-login-button'></div>";
             });
 
             add_shortcode('osv-guide-quotes', function ($atts) {
                 $default_atts = array(
-                    'user_id' => get_current_user_id(),
                     'seomake' => '',
                     'seomodel' => '',
                 );
                 $args = shortcode_atts($default_atts, $atts);
                 return "<div id='osv-guide-quotes' data-seomake='{$args['seomake']}' data-seomodel='{$args['seomodel']}'></div>";
             });
+
+            // don't show admin bar for subscriber level users.
+            if (get_current_user_id() && $wp_user_level = get_user_meta(get_current_user_id(), 'wp_user_level',
+                        true) == 0) {
+                add_filter(‘show_admin_bar’, ‘__return_false’);
+            }
         });
-
-
     }
 
 
@@ -154,6 +154,7 @@ __THIS;
         }
         $userArr = null;
         if ($userObj) {
+            $phone = get_user_meta($userObj->ID, 'phone', true);
             $userArr = [
                 'ID' => $userObj->ID,
                 'user_id' => $userObj->ID,
@@ -161,6 +162,7 @@ __THIS;
                 'user_nicename' => $userObj->user_nicename,
                 'user_email' => $userObj->user_email,
                 'display_name' => $userObj->display_name,
+                'phone' => $phone
             ];
         }
         return $userArr;
@@ -177,9 +179,18 @@ __THIS;
             'resturl' => rest_url(''),
             'home_url' => home_url(),
             'logout_url' => wp_logout_url('/'),
-            'lostPasswordUrl' => wp_lostpassword_url(),
+            'lost_password_url' => wp_lostpassword_url(),
             'loadingmessage' => __('Sending user info, please wait...')
         ];
+    }
+
+    function get_password_reset_url($user_id)
+    {
+        $url = home_url('', 'http');
+        $user = new WP_User((int)$user_id);
+        $adt_rp_key = get_password_reset_key($user);
+        $user_login = $user->user_login;
+        return network_site_url("wp-login.php?action=rp&key=$adt_rp_key&login=" . rawurlencode($user_login), 'login');
     }
 
     function osv_ajax_login()
@@ -232,65 +243,41 @@ __THIS;
                 header("Access-Control-Allow-Methods: HEAD, GET, POST, PUT, PATCH, DELETE");
             }
         }
-
-        //add_filter( 'wp_headers', function ( $headers ) {
-        //    $headers['Access-Control-Allow-Origin']      = get_http_origin(); // Can't use wildcard origin for credentials requests, instead set it to the requesting origin
-        //    $headers['Access-Control-Allow-Credentials'] = 'true';
-        //
-        //    // Access-Control headers are received during OPTIONS requests
-        //    if ( 'OPTIONS' == $_SERVER['REQUEST_METHOD'] ) {
-        //
-        //        if ( isset( $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'] ) ) {
-        //            $headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS';
-        //        }
-        //
-        //        if ( isset( $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'] ) ) {
-        //            $headers['Access-Control-Allow-Headers'] = $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'];
-        //        }
-        //
-        //    }
-        //
-        //    return $headers;
-        //}, 11, 1 );
-
-        //if ( 'OPTIONS' == $_SERVER['REQUEST_METHOD'] ) {
-        //    header("Access-Control-Allow-Origin: *");
-        //    header("Access-Control-Allow-Credentials: true");
-        //    header("Access-Control-Allow-Headers: Authorization, Origin, X-Requested-With, Content-Type, Accept");
-        //    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
-        //        header("Access-Control-Allow-Headers: " . $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']);
-        //
-        //    }
-        //    if ( isset( $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'] ) ) {
-        //        header("Access-Control-Allow-Methods: HEAD, GET, POST, PUT, PATCH, DELETE");
-        //    }
-        //
-        //    die;
-        //}
-
     }
 
-    protected function printBootstrap()
+    public function osv_admin_scripts()
     {
-        ?>
-        <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-              integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-              crossorigin="anonymous">
-
-        <!-- Optional theme -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
-              integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
-              crossorigin="anonymous">
-
-        <!-- Latest compiled and minified JavaScript -->
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-                crossorigin="anonymous"></script>
-
-        <?php
-
+        wp_register_style('osv-bootstrap', "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css");
+        wp_enqueue_style('osv-bootstrap');
+        wp_register_style('osv-bootstrap-theme',
+            "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css", ['osv-bootstrap']);
+        wp_enqueue_style('osv-bootstrap-theme');
+        wp_enqueue_script('osv-bootstrap-js', "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js",
+            array('jquery'), null, true);
     }
 
+    function my_show_extra_profile_fields($user)
+    { ?>
+        <h3>Extra profile information</h3>
+        <table class="form-table">
+            <tr>
+                <th><label for="phone">Phone Number</label></th>
+                <td>
+                    <input type="text" name="phone" id="phone"
+                           value="<?php echo esc_attr(get_the_author_meta('phone', $user->ID)); ?>"
+                           class="regular-text"/><br/>
+                    <span class="description">Please enter your phone number.</span>
+                </td>
+            </tr>
+        </table>
+        <?php
+    }
 
+    function my_save_extra_profile_fields($user_id)
+    {
+        if (!current_user_can('edit_user', $user_id)) {
+            return false;
+        }
+        update_user_meta($user_id, 'phone', $_POST['phone']);
+    }
 }

@@ -28,7 +28,7 @@ class RateBookList extends React.Component {
                     <th>Monthly price</th>
                     <th>Initial Payment</th>
                     <th>Contract Length</th>
-                    <th>Contract Term</th>
+                    <th>Contract Type</th>
                     <th>Mileage</th>
                     <th>Expiry</th>
                     <th><td><button className="btn btn-xs btn-primary" onClick={e=>this.props.onClickNewRateBook({book_type: this.props.bookType})}>New</button></td></th>

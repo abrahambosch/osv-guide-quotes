@@ -1,3 +1,18 @@
+# Guide Quotes Wordpress Plugin
+- Creates Guide Quotes Admin Page
+- Defines shortcodes:
+    - osv-guide-quotes - used on the model page
+    - osv-garage - used on the garage page. 
+    - osv-login-button - login button for the menu, etc
+    - osv-guide-quotes-admin - admin page
+- Loads React Components used by shortcodes
+    - React source code in the /src folder. 
+    - use npm start for development
+    - use "npm run build" to build the files used in the website. 
+
+    
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

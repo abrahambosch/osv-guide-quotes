@@ -85,7 +85,7 @@ class LoginForm extends React.Component {
                                 )}
                             </Field>
                             {submitError && <div className="error">{submitError}</div>}
-                            <a className="lost" href="">Lost your password?</a>
+                            <a className="lost" href={this.props.auth.lost_password_url}>Lost your password?</a>
                             <div>
                                 <input className="btn btn-primary" type="submit" value="Login" name="submit"/>
                             </div>

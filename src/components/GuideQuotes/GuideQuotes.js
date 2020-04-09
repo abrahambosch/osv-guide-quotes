@@ -1,8 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import GuideQuotesPrice from "./GuideQuotesPrice";
-
-//import { connect } from 'react-redux';
+import { connect } from 'react-redux';
 
 //import Modal from 'react-modal';
 
@@ -62,14 +61,13 @@ class GuideQuotes extends React.Component {
         errors: [],
         name: this.props.user?this.props.user.display_name:"",
         email: this.props.user?this.props.user.user_email:"",
-        phone: "",
+        phone: this.props.user?this.props.user.phone:"",
         consent: "",
         seomake: this.props.seomake,
         seomodel: this.props.seomodel,
         showSuccess: false,
         rateBook: null,
         garageItems: [],
-        user: null
     };
 
     reportError = (error) => {
@@ -246,4 +244,4 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default GuideQuotes;
+export default connect(mapStateToProps, {})(GuideQuotes);

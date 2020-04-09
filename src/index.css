@@ -65,7 +65,7 @@ label {
 }
 
 
-.request-guide-price input, .guide-price input {
+#osv-garage input, .request-guide-price input, .guide-price input {
   width: 100% !important;
 }
 
@@ -78,4 +78,9 @@ label {
   padding: 40px;
   position: absolute;
   right: 0;
+}
+
+#osv-guide-quotes-admin .modal-content {
+  overflow: scroll;
+  max-height: 90vh;
 }

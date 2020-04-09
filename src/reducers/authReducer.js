@@ -21,7 +21,8 @@ let initialState = {
     ajaxurl: "/wp-admin/admin-ajax.php",
     resturl: "/wp-json/osv_react",
     logout_url: "/wp-login.php?action=logout",
-    nonce: ""
+    nonce: "",
+    lost_password_url:"/wp-login.php?action=lostpassword"
 };
 if (window.osv_guide_quotes_wp) {
     if (window.osv_guide_quotes_wp.ajaxurl) {
@@ -51,16 +52,19 @@ else {
 }
 
 export default (state=initialState, action) => {
+    let user = null;
     switch (action.type) {
         case LOGIN_REQUEST:
             return {...state, loginErrors: null};
         case LOGIN_SUCCESS:
         case FETCH_USER:
-            localStorage.setItem('user', JSON.stringify(action.payload));
-            return {...state, user: action.payload, isLoggedIn: true, loginErrors: null};
+            user = {...action.payload, user_id:  action.payload.ID};
+            localStorage.setItem('user', JSON.stringify(user));
+            return {...state, user, isLoggedIn: true, loginErrors: null};
         case CREATE_USER_SUCCESS:
-            localStorage.setItem('user', JSON.stringify(action.payload));
-            return {...state, user: action.payload, isLoggedIn: true, loginErrors: null, createUserErrors: null};
+            user = {...action.payload, user_id:  action.payload.ID};
+            localStorage.setItem('user', JSON.stringify(user));
+            return {...state, user, isLoggedIn: true, loginErrors: null, createUserErrors: null};
         case CREATE_USER_FAILURE:
             return {...state, createUserErrors: action.payload};
         case LOGIN_FAILURE:

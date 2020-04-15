@@ -7,6 +7,7 @@ import ReactDOM from "react-dom";
 import Garage from "./components/Garage/Garage";
 import LoginForm from './components/Login/LoginForm';
 import LoginButton from './components/Login/LoginButton';
+import RegisterForm from './components/Login/RegisterForm';
 
 const osv_guide_quotes_wp = {
     "nonce": "b19ffcbbfd",
@@ -44,10 +45,7 @@ function App() {
                 </div>
             </div>
         </nav>
-
-        <div style={{width: 300}}>
-            <LoginForm />
-        </div>
+        <RegisterForm />
         <Garage />
         <div style={{width: 300}}>
             <GuideQuotes seomake={'honda'} seomodel={'cr-v-estate'}></GuideQuotes>

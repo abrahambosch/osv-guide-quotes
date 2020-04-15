@@ -84,3 +84,7 @@ label {
   overflow: scroll;
   max-height: 90vh;
 }
+
+form .red{
+  color: red;
+}

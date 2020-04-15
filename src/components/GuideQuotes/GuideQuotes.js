@@ -59,7 +59,7 @@ class GuideQuotes extends React.Component {
     state = {
         api_url: this.props.api_url?this.props.api_url:api_url,
         errors: [],
-        name: this.props.user?this.props.user.display_name:"",
+        name: this.props.user?this.props.user.first_name + " " + this.props.user.last_name:"",
         email: this.props.user?this.props.user.user_email:"",
         phone: this.props.user?this.props.user.phone:"",
         consent: "",
@@ -106,10 +106,6 @@ class GuideQuotes extends React.Component {
         });
     }
 
-
-
-
-
     handleChange = (event) => {
         const name = event.target.name;
         const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
@@ -123,8 +119,9 @@ class GuideQuotes extends React.Component {
         if (this.props.user !== prevProps.user) {
             if (!this.state.name && !this.state.email) {
                 this.setState({
-                    name: this.props.user.display_name,
-                    email: this.props.user.user_email
+                    name: this.props.user.first_name + " " + this.props.user.last_name,
+                    email: this.props.user.user_email,
+                    phone: this.props.user.phone
                 })
 
             }

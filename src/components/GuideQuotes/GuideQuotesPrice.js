@@ -90,8 +90,12 @@ class GuideQuotesPrice extends React.Component {
         console.log("onSubmit: ", this.state);
         //this.setState({selectedTab})
         let {name, phone, email, password} = this.state;
+        let name_arr = name.split(" ").filter(item => item.length);
+        let first_name = name_arr.shift();
+        let last_name = name_arr.join(" ");
+
         phone = phone.replace(/[^0-9]/g, "");
-        this.props.createUser(name, phone, email, password, (error, user) =>{
+        this.props.createUser(first_name, last_name, phone, email, password, (error, user) =>{
             console.log("created a user. ", user);
             this.addToGarage(user);
         });

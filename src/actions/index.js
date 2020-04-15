@@ -13,6 +13,7 @@ import {
     LOGIN_SUCCESS,
     LOGIN_FAILURE,
     LOGOUT_SUCCESS,
+    CREATE_USER_REQUEST,
     CREATE_USER_SUCCESS,
     CREATE_USER_FAILURE
 } from './types';
@@ -99,26 +100,49 @@ export const getUser = () => {
   }
 };
 
-export const createUser = (name, phone, email, password, callback) => async (dispatch, getState) => {
-    phone = phone.replace(/[^0-9]/g, "");
-    let data = {name, phone, email, password};
-    const apiurl = getState().auth.apiurl;
-    console.log("creating account: ", data);
-    const config = {headers: {'Authorization': 'Bearer ' + getState().auth.authtoken}};
-    return axios.post(apiurl + '/wpusers', data, config).then((response) => {
-        console.log(response);
-        if (response.data.data.user) {
-            dispatch({ type: CREATE_USER_SUCCESS, payload: response.data.data.user });
-            if (callback) {
-                callback(null, response.data.data.user);
-            }
+
+export const createUser = (first_name, last_name, phone, email, password, callback) => async (dispatch, getState) => {
+    console.log("action createUser", email, password);
+    const url = '/wp-admin/admin-ajax.php?action=osvajaxcreateuser'; // use relative url and let proxy take care of it on local.
+    const data = {
+        username: email,
+        password,
+        phone,
+        email,
+        first_name,
+        last_name,
+        action: 'osvajaxcreateuser',
+        secret: window.osv_guide_quotes_wp.nonce
+    };
+    dispatch({
+        type: CREATE_USER_REQUEST,
+        payload: { email }
+    });
+    await axios.post(url, qs.stringify(data), {
+        headers: {
+            Authorization: getState().auth.basic_auth
+        },
+        crossdomain: true
+    }).then(response => {
+        console.log("response from login: ", response);
+        if (response.data.status === 'SUCCESS') {
+            dispatch({
+                type: CREATE_USER_SUCCESS,
+                payload: response.data.data.user
+            });
         }
-    }).catch((error) => {
-        console.log(error);
-        dispatch({ type: CREATE_USER_FAILURE, payload: error });
-        if (callback) {
-            callback(error);
+        else {
+            dispatch({
+                type: CREATE_USER_FAILURE,
+                payload: 'Failure while creating user. Please check the username or password. '
+            });
         }
+
+    }).catch(error => {
+        dispatch({
+            type: CREATE_USER_FAILURE,
+            payload: 'Create User failed: ' + error
+        })
     });
 };
 

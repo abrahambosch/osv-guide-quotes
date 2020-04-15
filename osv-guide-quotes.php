@@ -13,9 +13,30 @@ defined('ABSPATH') or die('Direct script access disallowed.');
 
 new OsvGuideQuotesAdmin();
 
+class OsvException extends \Exception {
+    public $status = "ERROR";
+    public $detail = "";
+    public $validation = [];
+    public function setStatus($status) {
+        if (!empty($status)) $this->status = $status;
+        return $this;
+    }
+    public function setDetail($detail) {
+        if (!empty($detail)) $this->detail = $detail;
+        return $this;
+    }
+    public function setValidation($validation) {
+        if (!empty($validation)) $this->validation = $validation;
+        return $this;
+    }
+};
+
+
 class OsvGuideQuotesAdmin
 {
     public $slug = 'osv-guide-quotes';
+
+    protected $metaUserFields = ['first_name', 'last_name', 'phone', 'nickname'];   // fields we want returned with the user object.
 
     public function __construct()
     {
@@ -52,6 +73,8 @@ __THIS;
         add_action('admin_menu', array($this, 'admin_menu'));
         add_action('wp_ajax_nopriv_osvajaxlogin', [$this, 'osv_ajax_login']);
         add_action('wp_ajax_osvajaxlogin', [$this, 'osv_ajax_login']);
+        add_action('wp_ajax_nopriv_osvajaxcreateuser', [$this, 'osv_ajax_create_user']);
+        add_action('wp_ajax_osvajaxcreateuser', [$this, 'osv_ajax_create_user']);
         add_action('wp_enqueue_scripts', [$this, "osv_react_enqueue_scripts"]);
         add_action('admin_enqueue_scripts', [$this, "osv_react_enqueue_scripts"]);
         add_action('admin_enqueue_scripts', [$this, "osv_admin_scripts"]);
@@ -103,7 +126,7 @@ __THIS;
             // don't show admin bar for subscriber level users.
             if (get_current_user_id() && $wp_user_level = get_user_meta(get_current_user_id(), 'wp_user_level',
                         true) == 0) {
-                add_filter(‘show_admin_bar’, ‘__return_false’);
+                add_filter('show_admin_bar', '__return_false');
             }
         });
     }
@@ -154,7 +177,6 @@ __THIS;
         }
         $userArr = null;
         if ($userObj) {
-            $phone = get_user_meta($userObj->ID, 'phone', true);
             $userArr = [
                 'ID' => $userObj->ID,
                 'user_id' => $userObj->ID,
@@ -162,8 +184,10 @@ __THIS;
                 'user_nicename' => $userObj->user_nicename,
                 'user_email' => $userObj->user_email,
                 'display_name' => $userObj->display_name,
-                'phone' => $phone
             ];
+            foreach ($this->metaUserFields as $field) {
+                $userArr[$field] = get_user_meta($userObj->ID, $field, true);
+            }
         }
         return $userArr;
     }
@@ -203,36 +227,179 @@ __THIS;
 
     function osv_ajax_login()
     {
-        // First check the nonce, if it fails the function will break
-        //check_ajax_referer('ajax-login-nonce', 'security');
+        try {
+            // First check the nonce, if it fails the function will break
+            //check_ajax_referer('ajax-login-nonce', 'security');   // TODO: uncomment this.
 
-        // Nonce is checked, get the POST data and sign user on
-        $info = array();
-        $info['user_login'] = $_POST['username'];
-        $info['user_password'] = $_POST['password'];
-        $info['remember'] = true;
+            $email = $this->sanitizeEmail($_POST['username']);
+            $password = trim($_POST['password']);
 
-        $user_signon = wp_signon($info, false);
+            // validate
+            $validation_errors = [];
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $validation_errors['email'] = "Invalid email. ";
+            }
 
-        if (is_wp_error($user_signon)) {
+            if (empty($password) || strlen($password) < 8) {
+                $validation_errors['password'] = "Invalid password. ";
+            }
+
+            if (!empty($validation_errors)) {
+                throw (new OsvException("Invalid data. "))
+                    ->setStatus("ERROR_VALIDATION")
+                    ->setValidation($validation_errors);
+            }
+
+            // Nonce is checked, get the POST data and sign user on
+            $info = array();
+            $info['user_login'] = $email;
+            $info['user_password'] = $password;
+            $info['remember'] = true;
+
+            $user_signon = wp_signon($info, false);
+
+            if (is_wp_error($user_signon)) {
+                throw new OsvException("Wrong username or password");
+            } else {
+                $this->osv_json_response([
+                    'status' => "SUCCESS",
+                    "data" => [
+                        "user" => $this->getUserArr($user_signon)
+                    ]
+                ]);
+            }
+        }
+        catch (OsvException $e) {
+            $this->osv_json_response([
+                'status' => $e->status,
+                "error" => $e->getMessage(),
+                "validation" => $e->validation
+            ], 400);
+        }
+        catch (\Exception $e) {
             $this->osv_json_response([
                 'status' => "ERROR",
-                "error" => "Wrong username or password",
-                'user_signon' => $user_signon
-            ]);
-        } else {
-            $this->osv_json_response([
-                'status' => "SUCCESS",
-                "data" => [
-                    "user" => $this->getUserArr($user_signon)
-                ]
-            ]);
+                "error" => $e->getMessage()
+            ], 400);
         }
     }
 
-    function osv_json_response($obj)
+    function sanitizeString($str)
+    {
+        return trim(filter_var($str, FILTER_SANITIZE_STRING));
+    }
+
+    function sanitizeEmail($str)
+    {
+        return trim(filter_var($str, FILTER_SANITIZE_EMAIL));
+    }
+
+    function osv_ajax_create_user()
+    {
+        try {
+            // First check the nonce, if it fails the function will break
+            //check_ajax_referer('ajax-login-nonce', 'security');       // TODO: uncomment this.
+
+            $email = $this->sanitizeEmail($_POST['email']);
+            $password = trim($_POST['password']);
+
+            // validate
+            $validation_errors = [];
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $validation_errors['email'] = "Invalid email. ";
+            }
+
+            if (empty($password) || strlen($password) < 8) {
+                $validation_errors['password'] = "Invalid password. ";
+            }
+
+            if (!empty($validation_errors)) {
+                throw (new OsvException("Invalid data. "))
+                    ->setStatus("ERROR_VALIDATION")
+                    ->setValidation($validation_errors);
+            }
+
+
+            // Nonce is checked, get the POST data and sign user on
+            $info = array();
+            $info['user_login'] = $email;
+            $info['user_password'] = $password;
+            $info['remember'] = true;
+
+
+            // first check to see if a user exists already.
+            //$user = get_user_by( 'login', $info['user_login']);
+            $user = get_user_by('email', $info['user_login']);
+            if ($user) {
+                $user = wp_signon($info,
+                    false);    // if user alreay exists, attempt to login with the username/password.
+                if (is_wp_error($user)) {
+                    throw (new OsvException("User Already exists. "))
+                        ->setStatus("ERROR_USER_ALREADY_EXISTS")
+                        ->setDetail($user->get_error_message());
+                } else {
+                    $this->updateUserMeta($user->ID, $_POST);
+                    $this->osv_json_response([
+                        'status' => "SUCCESS",
+                        "data" => [
+                            "user" => $this->getUserArr($user)
+                        ]
+                    ]);
+                }
+            } else {
+                $user_id = wp_create_user($info['user_login'], $info['user_password'], $info['user_login']);
+                if ($user_id) {
+                    $this->updateUserMeta($user_id, $_POST);
+                    $user = wp_signon($info, false);
+                    if (is_wp_error($user)) {
+                        throw new OsvException("Wrong username or password");
+                    } else {
+                        $this->osv_json_response([
+                            'status' => "SUCCESS",
+                            "data" => [
+                                "user" => $this->getUserArr($user)
+                            ]
+                        ]);
+                    }
+                } else {
+                    throw new OsvException("Error while creating the user. ");
+                }
+            }
+        }
+        catch (OsvException $e) {
+            $this->osv_json_response([
+                "status" => $e->status,
+                "error" => $e->getMessage(),
+                "validation" => $e->validation
+            ], 400);
+        }
+        catch (\Exception $e) {
+            $this->osv_json_response([
+                "status" => "ERROR",
+                "error" => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    function updateUserMeta($user_id, $arr)
+    {
+        foreach ($arr as $k => $v) {
+            if (!in_array($k, $this->metaUserFields)) continue;
+            $v = $this->sanitizeString($v);
+            if (!empty($v)) {
+                update_user_meta($user_id, $k, $v);
+            }
+        }
+    }
+
+
+
+    function osv_json_response($obj, $status_code=200)
     {
         header("Content-Type: application/json");
+        if ($status_code != 200) {
+            status_header( $status_code );
+        }
         echo json_encode($obj);
         die;
     }

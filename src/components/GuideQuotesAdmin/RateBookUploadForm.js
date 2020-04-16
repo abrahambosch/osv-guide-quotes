@@ -1,4 +1,5 @@
 import React from 'react';
+import loading_img from '../../images/giphy.gif';
 
 class RateBookUploadForm extends React.Component {
     componentDidMount() {
@@ -10,7 +11,8 @@ class RateBookUploadForm extends React.Component {
         this.state ={
             file:null,
             description: "",
-            expiration: ""
+            expiration: "",
+            funder: "",
         };
         this.onFormSubmit = this.onFormSubmit.bind(this);
         this.onFileChange = this.onFileChange.bind(this);
@@ -25,7 +27,8 @@ class RateBookUploadForm extends React.Component {
         this.props.onSubmit({
             file: this.state.file,
             description: this.state.description,
-            expiration: this.state.expiration
+            expiration: this.state.expiration,
+            funder: this.state.funder
         });
     }
     handleChange(event) {
@@ -49,6 +52,11 @@ class RateBookUploadForm extends React.Component {
                                        value={this.state.description} onChange={this.handleChange}/>
                             </div>
                             <div className="form-group">
+                                <label>Funder</label>
+                                <input className="form-control" type="text" name="funder"
+                                       value={this.state.funder} onChange={this.handleChange}/>
+                            </div>
+                            <div className="form-group">
                                 <label>Book Expiration</label>
                                 <input className="form-control" type="date" name="expiration"
                                        value={this.state.expiration} onChange={this.handleChange}/>
@@ -61,6 +69,11 @@ class RateBookUploadForm extends React.Component {
                             <div>
                                 <button type="submit">Upload</button>
                             </div>
+                            {this.props.showLoading && (
+                                <div>
+                                    <img src={loading_img} alt="loading" style={{width: '100px'}}/>
+                                </div>
+                            )}
                         </form>
                     </div>
                 </div>

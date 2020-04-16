@@ -10,6 +10,7 @@ class RateBookUploadList extends React.Component {
             <tr key={index}>
                 <td>{item.name}</td>
                 <td>{item.description}</td>
+                <td>{item.funder}</td>
                 <td>{item.filename}</td>
                 <td>{item.expiration}</td>
                 <td>{item.active}</td>
@@ -26,6 +27,7 @@ class RateBookUploadList extends React.Component {
                 <tr>
                     <th>Name</th>
                     <th>Description</th>
+                    <th>Funder</th>
                     <th>Filename</th>
                     <th>Expiry</th>
                     <th>Active</th>

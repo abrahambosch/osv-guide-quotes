@@ -37,6 +37,7 @@ class GuideQuotesAdmin extends React.Component {
 
             editRateBook: null,
             editRateBookShow: false,     // show the popup to edit a rateBook
+            submittingRateBook: false,
 
             rateBookUploadModalShow: false,
 
@@ -95,11 +96,13 @@ class GuideQuotesAdmin extends React.Component {
         this.loadOverrides(this.state.overridesListPage);
     }
     onSubmitRateBookUploadForm(obj) {
+        this.setState({submittingRateBook: true});
         const url = this.state.api_url + '/rateBookUploads/import';
         const formData = new FormData();
         formData.append('new_ratesbook_file', obj.file);
         formData.append('new_ratesbook_description', obj.description);
         formData.append('new_ratesbook_expiration', obj.expiration);
+        formData.append('new_ratesbook_funder', obj.funder);
         const config = {
             headers: {
                 'Content-Type': 'multipart/form-data'
@@ -118,16 +121,18 @@ class GuideQuotesAdmin extends React.Component {
             console.log(response);
             this.reloadLists();
             this.loadRateBookUploads();
-            this.setState({rateBookUploadModalShow: false});
+            this.setState({rateBookUploadModalShow: false, submittingRateBook: false});
         }).catch((error) => {
             console.log(error);
             this.reportError(error);
+            this.setState({submittingRateBook: false});
         });
     }
     onSubmitEditRateBookForm(rateBook) {
         console.log("onSubmitEditRateBookForm called. ", rateBook);
         // save
         if (rateBook.id) {  // update existing
+
             const url = this.state.api_url + "/rateBooks/" + rateBook.id;
             return axios.put(url, rateBook).then((response) => {
                 console.log(response);
@@ -147,6 +152,7 @@ class GuideQuotesAdmin extends React.Component {
             }).catch((error) => {
                 console.log(error);
                 this.reportError(error);
+                this.setState({submittingRateBook: false});
             });
         }
         // reload lists.
@@ -342,6 +348,7 @@ class GuideQuotesAdmin extends React.Component {
                             >
                                 <RateBookUploadForm
                                     onSubmit={this.onSubmitRateBookUploadForm}
+                                    showLoading={this.state.submittingRateBook}
                                 ></RateBookUploadForm>
                             </Modal>
                         )}

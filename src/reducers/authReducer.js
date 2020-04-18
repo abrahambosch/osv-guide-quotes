@@ -5,7 +5,9 @@ import {
     LOGIN_FAILURE,
     LOGOUT_SUCCESS,
     CREATE_USER_SUCCESS,
-    CREATE_USER_FAILURE
+    CREATE_USER_FAILURE,
+    UPDATE_USER_SUCCESS,
+    UPDATE_USER_FAILURE
 } from '../actions/types';
 
 let api_url = "https://api.osv.ltd.uk";
@@ -67,10 +69,12 @@ export default (state=initialState, action) => {
             localStorage.setItem('user', JSON.stringify(user));
             return {...state, user, isLoggedIn: true, loginErrors: null};
         case CREATE_USER_SUCCESS:
+        case UPDATE_USER_SUCCESS:
             user = {...action.payload, user_id:  action.payload.ID};
             localStorage.setItem('user', JSON.stringify(user));
             return {...state, user, isLoggedIn: true, loginErrors: null, createUserErrors: null};
         case CREATE_USER_FAILURE:
+        case UPDATE_USER_FAILURE:
             return {...state, createUserErrors: action.payload};
         case LOGIN_FAILURE:
             console.log("LOGIN_FAILURE", action.payload);

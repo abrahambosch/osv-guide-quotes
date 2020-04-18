@@ -17,10 +17,9 @@ import { connect } from 'react-redux';
             </div>;
         }
         return <div>
-            <h2>Welcome to your OSV Garage</h2>
             <Tabs>
                 <Tab label={"Guide Quotes"}><GarageGuideQuotes /></Tab>
-                <Tab label={"Official Quotes"}><GarageOfficialQuotes /></Tab>
+                {/*<Tab label={"Official Quotes"}><GarageOfficialQuotes /></Tab>*/}
                 <Tab label={"My Account"}><GarageMyAccount /></Tab>
             </Tabs>
         </div>;

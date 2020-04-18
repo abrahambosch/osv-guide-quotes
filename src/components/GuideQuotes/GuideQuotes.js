@@ -67,6 +67,7 @@ class GuideQuotes extends React.Component {
         seomodel: this.props.seomodel,
         showSuccess: false,
         rateBook: null,
+        callbackRequest: null,
         garageItems: [],
     };
 
@@ -99,6 +100,9 @@ class GuideQuotes extends React.Component {
             console.log(response);
             if (response.data.data.rateBook) {
                 this.setState({rateBook: response.data.data.rateBook})
+            }
+            if (response.data.data.callbackRequest) {
+                this.setState({callbackRequest: response.data.data.callbackRequest})
             }
         }).catch((error) => {
             console.log(error);
@@ -136,7 +140,7 @@ class GuideQuotes extends React.Component {
             return (<div key={i} className={"alert alert-danger alert-dismissible"} role="alert" onClick={()=> {this.removeError(i)}}>{item}</div> );
         });
 
-        let {rateBook} = this.state;
+        let {rateBook, callbackRequest} = this.state;
         if (rateBook) {
             /*
             id: 2947
@@ -175,11 +179,21 @@ class GuideQuotes extends React.Component {
                 ></GuideQuotesPrice>
             );
         }
+        else if (callbackRequest) {
+            return (
+                <div className="request-guide-price">
+                    <h2>Want this car at a great price?</h2>
+                    <p> We’ll find you a great price to buy, lease or finance this vehicle. </p>
+                    <h3 className="text-center"><span className="glyphicon glyphicon-ok" aria-hidden="true"></span> Request Received. </h3>
+                    A team member will be in contact with you.
+                </div>
+            );
+        }
         else {
             return (
                 <div className="request-guide-price">
                     <h2>Want this car at a great price?</h2>
-                    <p>Request a callback and we'll find you a great price to buy or lease. </p>
+                    <p>Submit your details below for our pricing information. </p>
                     {errors}
                     <form onSubmit={this.onSubmit}>
                         <div>
@@ -213,16 +227,15 @@ class GuideQuotes extends React.Component {
                             </div>
                         </div>
                         <div className="request-guide-price-consent">
-                            <label>Consent<span>*</span></label>
-                            <input type="checkbox" name="consent" value={this.state.consent}
-                                   onChange={this.handleChange}/>
+                            <label><input type="checkbox" name="consent" value={this.state.consent}
+                                          onChange={this.handleChange} required="required"/> Consent<span> * </span> &nbsp; </label>
                             By ticking this box you are agreeing that OSV Ltd can process and store the data that you
                             have entered in this form - as well as any other information provided during our sales
                             processes.
                         </div>
                         <div>
                             <div className="form-group">
-                                <input type="submit" className="btn" value="Request guide price"/>
+                                <input type="submit" className="btn" value="Request price information"/>
                             </div>
                         </div>
                     </form>
@@ -231,6 +244,22 @@ class GuideQuotes extends React.Component {
         }
     }
 }
+
+const validate = values => {
+  let errors = {};
+  if (!values.name) {
+      errors.name = "Please enter your name. ";
+  }
+    if (!values.phone) {
+        errors.name = "Please enter your phone. ";
+    }
+    if (!values.email) {
+        errors.name = "Please enter your email. ";
+    }
+    if (!values.consent) {
+        errors.consent = "Please check the box to confirm consent. ";
+    }
+};
 
 const mapStateToProps = (state) => {
     return {

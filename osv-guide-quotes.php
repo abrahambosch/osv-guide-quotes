@@ -339,6 +339,7 @@ __THIS;
                         ->setDetail($user->get_error_message());
                 } else {
                     $this->updateUserMeta($user->ID, $_POST);
+                    $this->sendWelcomeEmail($user);
                     $this->osv_json_response([
                         'status' => "SUCCESS",
                         "data" => [
@@ -455,4 +456,50 @@ __THIS;
         }
         update_user_meta($user_id, 'phone', $_POST['phone']);
     }
+
+    protected function sendWelcomeEmail($user)
+    {
+        try {
+            $to = $user->email;
+            $subject = "Thank you for creating your OSV Garage!";
+            $message = $this->getWelcomeEmailBody($user);
+            wp_mail($to, $subject, $message);
+        }
+        catch (\Exception $e) {
+            ;
+        }
+    }
+
+    protected function getWelcomeEmailBody($user)
+    {
+        $name = $user->first_name;
+        $email = $user->email;
+
+        $emailBody = <<<__THIS
+Hi $name,
+
+Thank you for creating your OSV Garage!
+
+Your login details are as follows:
+
+Email: $email
+
+You can update or change your password here: https://www.osv.ltd.uk/garage/#account
+
+In your garage you will be able to:
+Save cars you have browsed on the website
+Save guide pricing for those vehicles
+Request official quotes tailored to your requirements by requesting a call back from a Vehicle Specialist
+
+If you have any questions about your OSV Garage. Please do get in touch with us on 01903 538835.
+
+We hope you enjoy searching for your next vehicle!
+
+
+The OSV Team
+
+__THIS;
+        return $emailBody;
+    }
+
 }

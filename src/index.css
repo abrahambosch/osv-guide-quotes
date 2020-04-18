@@ -64,8 +64,12 @@ label {
   margin-right: 15px;
 }
 
+#osv-garage {
+  margin: 50px 0;
+  min-height: 300px;
+}
 
-#osv-garage input, .request-guide-price input, .guide-price input {
+#osv-garage input, .request-guide-price input, .guide-price input, .osv-login-form input, .osv-register-form input, .osv-login-form .form-group {
   width: 100% !important;
 }
 
@@ -75,9 +79,18 @@ label {
 .osv-login-button-form {
   z-index: 10000000;
   background: #fff;
-  padding: 40px;
+  padding: 40px 0;
   position: absolute;
   right: 0;
+  box-shadow: -8px 10px 32px -16px rgba(0,0,0,0.78);
+  min-width: 300px;
+  color: #0f0f0f;
+}
+.osv-login-button-form .item {
+  padding: 0 20px;
+}
+.osv-login-form {
+  padding: 0 40px;
 }
 
 #osv-guide-quotes-admin .modal-content {
@@ -87,4 +100,25 @@ label {
 
 form .red{
   color: red;
+}
+
+.osv-register-form {
+  min-width: 500px;
+  max-width: 100%;
+  padding: 30px;
+}
+
+.osv-login-button-form .small-link {
+  line-height: 12px;
+  font-size: 12px;
+  text-transform: none;
+}
+
+.request-guide-price-consent label, .request-guide-price-consent input[type=checkbox], .osv-register-form input[type=checkbox] {
+  display: inline-block;
+  width: auto !important;
+}
+
+.request-guide-price {
+  margin-bottom: 30px;
 }

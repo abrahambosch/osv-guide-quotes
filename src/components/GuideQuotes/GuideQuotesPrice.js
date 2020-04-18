@@ -188,7 +188,7 @@ class GuideQuotesPrice extends React.Component {
         return (
             <div className="guide-price">
                 <div className="guide-price-box">
-                    <h2>Guide Price</h2>
+                    <h2>Prices from</h2>
                     <div className={"guide-price-price"}>
                         £{nf(rateBook.monthly_price)} + VAT * per month
                     </div>
@@ -219,27 +219,29 @@ class GuideQuotesPrice extends React.Component {
                         <a href="/garage" className="btn">See this in your garage</a>
                     )}
 
-                    {!this.state.saveToGarageButtonClicked && (
-                        <div>
-                            <button className="btn" onClick={this.onClickSaveToGarage}>Save to my garage</button>
-                        </div>
-                    )}
+
 
                     {this.props.user && <div>
                         <div>
-                            Need to tailor this quote to meet your requirements?
+                            Contract terms including mileage, initial payments and contract length can be tailored to your requirements.
                         </div>
                         {!this.state.requestCallbackReceived && <div>
-                            <button className="btn" onClick={this.requestOfficialQuote}>Request Official Quote</button>
+                            <button className="btn" onClick={this.requestOfficialQuote}>Request a Callback</button>
                         </div>}
                         {this.state.requestCallbackReceived && <div>
                             <h3>Request Received. </h3>
                             A team member will be in contact with you.
                         </div>}
                     </div>}
+
+                    {!this.state.saveToGarageButtonClicked && (
+                        <div>
+                            <button className="btn" onClick={this.onClickSaveToGarage}>Save to my garage</button>
+                        </div>
+                    )}
                 </div>
-                <div className="small">*pricing is subject to availability. T&amp;C's and the above contract
-                    conditions
+                <div className="small">* Please read our  <a href="https://www.osv.ltd.uk/conditions/" target="_blank">T&amp;Cs</a>
+
                 </div>
             </div>
         );

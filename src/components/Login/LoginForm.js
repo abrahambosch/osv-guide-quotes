@@ -2,8 +2,12 @@ import React from 'react'
 import {Form, Field} from 'react-final-form'
 import {attemptLogin, attemptLogout} from '../../actions'
 import {connect} from 'react-redux';
+import RegisterForm from "./RegisterForm";
 
 class LoginForm extends React.Component {
+    state = {
+      showRegisterForm: false
+    };
     renderInput = (formProps) => {
         console.log("LoginForm renderInput formProps", formProps);
         let errorMessage = null;
@@ -33,19 +37,38 @@ class LoginForm extends React.Component {
 
     render() {
         if (!this.props.auth.user) {
-            return this.renderForm();
+            if (this.state.showRegisterForm) {
+                return <div>
+                    <RegisterForm />
+                    <div className="item">
+                        <a className="small-links" onClick={e=>this.setState({showRegisterForm: false})}>If you already have an account, click here to Login. </a>
+                    </div>
+                </div>;
+            }
+            else {
+                return this.renderForm();
+            }
         }
         let logout_url = this.props.auth.logout_url;
         //let btn = <button onClick={this.props.attemptLogout} className="btn btn-primary">Logout</button>;
         let btn = <a href={logout_url} onClick={e => {
             e.preventDefault();
             this.props.attemptLogout();
-        }} className="btn btn-primary">Logout</a>;
+        }} className="">Logout</a>;
         return (
-            <div>
+            <div className='osv-logged-in-menu'>
+                <div className="item">
                 Hi, {this.props.auth.user.display_name}. <br />
                 You are logged in. <br />
-                {btn}
+                </div>
+                <hr />
+                <div className="item">
+                    <a href="/garage" className="">My Garage</a>
+                </div>
+                <hr />
+                <div className="item">
+                    {btn}
+                </div>
             </div>
         );
     }
@@ -56,7 +79,7 @@ class LoginForm extends React.Component {
             loginErrors = <div className="alert alert-danger" role="alert">{this.props.auth.loginErrors}</div>;
         }
 
-        return <div>
+        return <div className="osv-login-form">
             <Form
                 onSubmit={this.onSubmit} validate={validate}
                 render={({submitError, handleSubmit, form, submitting, pristine, values}) => (
@@ -85,9 +108,14 @@ class LoginForm extends React.Component {
                                 )}
                             </Field>
                             {submitError && <div className="error">{submitError}</div>}
-                            <a className="lost" href={this.props.auth.lost_password_url}>Lost your password?</a>
+                            <div>
+                                <a className="lost" href={this.props.auth.lost_password_url}>Lost your password?</a>
+                            </div>
                             <div>
                                 <input className="btn btn-primary" type="submit" value="Login" name="submit"/>
+                            </div>
+                            <div>
+                                <a className="small-link" onClick={e=>this.setState({showRegisterForm: true})}>If you don't have an account, click here to Signup. </a>
                             </div>
                             {this.props.debug && <div>
                                 <pre>{JSON.stringify(values, 0, 2)}</pre>

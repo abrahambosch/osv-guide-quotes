@@ -15,7 +15,10 @@ import {
     LOGOUT_SUCCESS,
     CREATE_USER_REQUEST,
     CREATE_USER_SUCCESS,
-    CREATE_USER_FAILURE
+    CREATE_USER_FAILURE,
+    UPDATE_USER_REQUEST,
+    UPDATE_USER_SUCCESS,
+    UPDATE_USER_FAILURE
 } from './types';
 
 console.log("process.env object", process.env);
@@ -130,19 +133,70 @@ export const createUser = (first_name, last_name, phone, email, password, callba
                 type: CREATE_USER_SUCCESS,
                 payload: response.data.data.user
             });
+            if (callback) callback(null, response.data.data.user);
         }
         else {
             dispatch({
                 type: CREATE_USER_FAILURE,
                 payload: 'Failure while creating user. Please check the username or password. '
             });
+            if (callback) callback('Failure while creating user. Please check the username or password. ');
         }
 
     }).catch(error => {
         dispatch({
             type: CREATE_USER_FAILURE,
             payload: 'Create User failed: ' + error
-        })
+        });
+        if (callback) callback('Create User failed: ' + error);
+    });
+};
+
+export const updateUser = (first_name, last_name, phone, email, password, callback) => async (dispatch, getState) => {
+    console.log("action createUser", email, password);
+    const url = '/wp-admin/admin-ajax.php?action=osvajaxupdateuser'; // use relative url and let proxy take care of it on local.
+    const data = {
+        username: email,
+        password,
+        phone,
+        email,
+        first_name,
+        last_name,
+        action: 'osvajaxupdateuser',
+        secret: window.osv_guide_quotes_wp.nonce
+    };
+    dispatch({
+        type: UPDATE_USER_REQUEST,
+        payload: { email }
+    });
+    await axios.post(url, qs.stringify(data), {
+        headers: {
+            Authorization: getState().auth.basic_auth
+        },
+        crossdomain: true
+    }).then(response => {
+        console.log("response from login: ", response);
+        if (response.data.status === 'SUCCESS') {
+            dispatch({
+                type: UPDATE_USER_SUCCESS,
+                payload: response.data.data.user
+            });
+            if (callback) callback(null, response.data.data.user);
+        }
+        else {
+            dispatch({
+                type: UPDATE_USER_FAILURE,
+                payload: 'Failure while creating user. Please check the username or password. '
+            });
+            if (callback) callback('Failure while creating user. Please check the username or password. ');
+        }
+
+    }).catch(error => {
+        dispatch({
+            type: CREATE_USER_FAILURE,
+            payload: 'Create User failed: ' + error
+        });
+        if (callback) callback('Create User failed: ' + error);
     });
 };
 

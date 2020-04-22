@@ -54,7 +54,7 @@ class LoginForm extends React.Component {
         let btn = <a href={logout_url} onClick={e => {
             e.preventDefault();
             this.props.attemptLogout();
-        }} className="">Logout</a>;
+        }} className="osv-logged-in-menu-a">Logout</a>;
         return (
             <div className='osv-logged-in-menu'>
                 <div className="item">
@@ -63,7 +63,7 @@ class LoginForm extends React.Component {
                 </div>
                 <hr />
                 <div className="item">
-                    <a href="/garage" className="">My Garage</a>
+                    <a href="/garage" className="osv-logged-in-menu-a">My Garage</a>
                 </div>
                 <hr />
                 <div className="item">

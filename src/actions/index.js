@@ -205,7 +205,7 @@ export const attemptLogout = () => async (dispatch, getState) => {
     window.location.href = getState().auth.logout_url;
 };
 
-export const attemptLogin = (username, password) => async (dispatch, getState) => {
+export const attemptLogin = (username, password, callback) => async (dispatch, getState) => {
     console.log("action attemptLogin", username, password);
     const url = '/wp-admin/admin-ajax.php?action=osvajaxlogin'; // use relative url and let proxy take care of it on local.
     const data = {
@@ -224,14 +224,17 @@ export const attemptLogin = (username, password) => async (dispatch, getState) =
         console.log("response from login: ", response);
         if (response.data.status === 'SUCCESS') {
             dispatch(success(response.data.data.user));
+            if (callback) callback(null, response.data.data.user);
         }
         else {
             dispatch(failure('Invalid username or password '));
+            if (callback) callback('Invalid username or password ');
             //throw new SubmissionError({ username: 'User or password is invalid', _error: 'Login failed!' });
         }
 
     }).catch(error => {
-        dispatch(failure('Login failed: ' + error));
+        dispatch(failure('Invalid username or password'));
+        if (callback) callback('Invalid username or password ');
         //throw new SubmissionError({ username: 'User or password is invalid', _error: 'Login failed!' + error })
     });
 

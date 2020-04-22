@@ -47,8 +47,32 @@ label {
   margin: 8px 16px 30px 0;
   color: #FFFFFF;
   width: 100%;
+  transition: background-color 0.5s ease;
+}
+.guide-price .btn:hover, .request-guide-price .btn:hover {
+  background-color: #ff5d00;
 }
 
+.osv-login-button-wrapper .osv-login-button, .osv-login-button, .osv-login-form .btn-primary, .osv-register-form .btn-primary {
+  background-color: #00625a;
+  background-image: none;
+  transition: background-color 0.5s ease;
+  border: 1px solid #00625a;
+}
+.osv-login-button-wrapper .osv-login-button:hover, .osv-login-button:hover, .osv-login-form .btn-primary:hover, .osv-register-form .btn-primary:hover {
+  background-color: #078f68;
+}
+
+.toolbar .osv-login-button, .toolbar .osv-login-button:visited {
+  background-color: #f88a00;
+  color: #fff;
+  padding: 2px 10px;
+  margin-top: 3px;
+}
+
+.toolbar .osv-login-button:hover {
+  background-color: #ff6600;
+}
 
 .garage-guide-quote {
   background-color: #F6F5F5;
@@ -75,6 +99,19 @@ label {
 
 .osv-login-button-wrapper {
   position: relative;
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 500;
+  color: black;
+}
+.osv-logged-in-menu .item a, .osv-logged-in-menu-a{
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 500;
+  color: black;
+}
+.osv-logged-in-menu .item a:hover, .osv-logged-in-menu-a:hover{
+  color: black !important;
 }
 .osv-login-button-form {
   z-index: 10000000;
@@ -121,4 +158,33 @@ form .red{
 
 .request-guide-price {
   margin-bottom: 30px;
+}
+
+.nav-tabs {
+  border-bottom: 1px solid #ddd;
+}
+.nav-tab {
+  font-family: 'Roboto', sans-serif;
+  background-color: #fff;
+  display: inline-block;
+  padding: 10px 25px;
+  color: #bbb;
+  border-bottom: 1px solid #ddd;
+  text-decoration: none;
+  margin-bottom: -1px;
+}
+
+.nav-tab:hover {
+  background-color: #f1f9f2;
+  text-decoration: none;
+}
+
+.nav-tab.active {
+  background-color: #fff;
+  color: #555;
+  border: 1px solid #ddd;
+  border-top: 2px solid #16b619;
+  border-bottom: 1px solid #fff;
+  cursor: default;
+  text-decoration: none;
 }

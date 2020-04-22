@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { createUser, createGarageItem, requestCallback } from '../../actions';
+import { createUser, createGarageItem, requestCallback, attemptLogin } from '../../actions';
 
 
 let api_url = "https://api.osv.ltd.uk";
@@ -65,6 +65,7 @@ class GuideQuotesPrice extends React.Component {
         passwordConfirm: "",
         saveToGarageButtonClicked: false,
         requestCallbackReceived: false,
+        showPasswordForm: false,
         garageItem: null
     };
 
@@ -85,6 +86,15 @@ class GuideQuotesPrice extends React.Component {
         this.setState({errors});
     };
 
+    onSubmitLoginUser = (e) => {
+        e.preventDefault();
+        let { email, password } = this.state;
+        this.props.attemptLogin(email, password, (error, user) => {
+           if (!error && user) {
+               this.addToGarage(user);
+           }
+        });
+    }
     onSubmitCreateUser = (e) => {
         e.preventDefault();
         console.log("onSubmit: ", this.state);
@@ -190,30 +200,56 @@ class GuideQuotesPrice extends React.Component {
                 <div className="guide-price-box">
                     <h2>Prices from</h2>
                     <div className={"guide-price-price"}>
-                        £{nf(rateBook.monthly_price)} + VAT * per month
+                        £{nf(rateBook.monthly_price)} + VAT per month
                     </div>
                     <div className="guide-price-body">
                         Based on {nf(rateBook.mileage)} miles per year<br/>
                         £{nf(rateBook.initial_payment)} + VAT initial payment<br/>
-                        {rateBook.contract_length} month contract<br/>
-                        {rateBook.contract_term}
+                        {rateBook.contract_term} month contract<br/>
+
                     </div>
                     {(this.state.saveToGarageButtonClicked && !this.props.user) && (
-                        <form onSubmit={this.onSubmitCreateUser}>
-                            <div className="form-group">
-                                <label>Please create a password:</label>
-                                <input type="password" name="password" value={this.state.password}
-                                       onChange={this.handleChange}/>
-                            </div>
-                            <div className="form-group">
-                                <label>Please confirm a password:</label>
-                                <input type="password" name="passwordConfirm" value={this.state.passwordConfirm}
-                                       onChange={this.handleChange}/>
-                            </div>
-                            <div>
-                                <button type="submit" className="btn">Create Garage</button>
-                            </div>
-                        </form>
+                        <div>
+                            {(this.state.showPasswordForm) && (
+                            <form onSubmit={this.onSubmitCreateUser}>
+                                <div className="form-group">
+                                    <label>Please create a password:</label>
+                                    <input type="password" name="password" value={this.state.password}
+                                           onChange={this.handleChange}/>
+                                </div>
+                                <div className="form-group">
+                                    <label>Please confirm a password:</label>
+                                    <input type="password" name="passwordConfirm" value={this.state.passwordConfirm}
+                                           onChange={this.handleChange}/>
+                                </div>
+                                <div>
+                                    <button type="submit" className="btn">Create Garage</button>
+                                </div>
+                            </form>)}
+
+                            {(!this.state.showPasswordForm) && (
+                                <div>
+                                    <form onSubmit={this.onSubmitLoginUser}>
+                                        <div className="form-group">
+                                            <label>Email:</label>
+                                            <input type="text" name="email" value={this.state.email}
+                                            onChange={this.handleChange}/>
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Password:</label>
+                                            <input type="password" name="password" value={this.state.password}
+                                            onChange={this.handleChange}/>
+                                        </div>
+                                        <div>
+                                            <button type="submit" className="btn">Login</button>
+                                        </div>
+                                    </form>
+                                    <div>
+                                        <a onClick={e=>this.setState({showPasswordForm:true})}>Click Here to Create an account. </a>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     )}
                     {(this.state.saveToGarageButtonClicked && this.props.user) && (
                         <a href="/garage" className="btn">See this in your garage</a>
@@ -260,5 +296,6 @@ const mapStateToProps = (state) => {
 export default connect(mapStateToProps, {
     createUser,
     createGarageItem,
-    requestCallback
+    requestCallback,
+    attemptLogin
 })(GuideQuotesPrice);

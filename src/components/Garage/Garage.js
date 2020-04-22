@@ -5,6 +5,9 @@ import GarageGuideQuotes from './GarageGuideQuotes';
 import GarageMyAccount from './GarageMyAccount';
 import LoginForm from "../Login/LoginForm";
 import { connect } from 'react-redux';
+import { HashRouter as Router, Route, Switch, Link } from 'react-router-dom';
+import { RoutedTabs, NavTab } from "react-router-tabs";
+
 
  class Garage extends React.Component {
     render() {
@@ -17,14 +20,35 @@ import { connect } from 'react-redux';
             </div>;
         }
         return <div>
-            <Tabs>
-                <Tab label={"Guide Quotes"}><GarageGuideQuotes /></Tab>
-                {/*<Tab label={"Official Quotes"}><GarageOfficialQuotes /></Tab>*/}
-                <Tab label={"My Account"}><GarageMyAccount /></Tab>
-            </Tabs>
+            <Router>
+                <Route path="/" component={MyTabs} />
+            </Router>
         </div>;
     }
 }
+
+const MyTabs = (props) => {
+     console.log("mytabs", props, this);
+    const { path } = props.match;
+    return (
+        <div>
+            <div className="nav-tabs">
+                <NavTab to={`${path}`} exact className="nav-tab">Garage</NavTab>
+                {/*<NavTab to={`${path}quotes`} className="nav-tab">Official Quotes</NavTab>*/}
+                {/*<NavTab to={`${path}account`} className="nav-tab">My Account</NavTab>*/}
+            </div>
+            <div className="tabs">
+                <Switch>
+                    <Route path={`${path}`} exact component={GarageGuideQuotes} />
+                    {/*<Route path={`${path}quotes`} component={GarageOfficialQuotes} />*/}
+                    <Route path={`${path}account`} component={GarageMyAccount} />
+                </Switch>
+            </div>
+        </div>
+    );
+};
+
+
 
 const mapStateToProps = (state) => {
      return {

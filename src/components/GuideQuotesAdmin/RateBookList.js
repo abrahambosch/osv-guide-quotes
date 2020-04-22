@@ -10,9 +10,8 @@ class RateBookList extends React.Component {
         const trItems = rateBookList.map((item,index) => (
             <tr key={index}>
                 <td>{item.name}</td>
-                <td>{item.monthly_price}</td>
-                <td>{item.initial_payment}</td>
-                <td>{item.contract_length}</td>
+                <td>£{item.monthly_price}</td>
+                <td>£{item.initial_payment}</td>
                 <td>{item.contract_term}</td>
                 <td>{item.mileage}</td>
                 <td>{item.expiration.substr(0,10)}</td>
@@ -28,7 +27,6 @@ class RateBookList extends React.Component {
                     <th>Monthly price</th>
                     <th>Initial Payment</th>
                     <th>Contract Length</th>
-                    <th>Contract Type</th>
                     <th>Mileage</th>
                     <th>Expiry</th>
                     <th><td><button className="btn btn-xs btn-primary" onClick={e=>this.props.onClickNewRateBook({book_type: this.props.bookType})}>New</button></td></th>

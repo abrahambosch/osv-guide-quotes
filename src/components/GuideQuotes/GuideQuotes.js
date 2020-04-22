@@ -2,6 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import GuideQuotesPrice from "./GuideQuotesPrice";
 import { connect } from 'react-redux';
+import _ from 'lodash';
 
 //import Modal from 'react-modal';
 
@@ -71,6 +72,7 @@ class GuideQuotes extends React.Component {
         garageItems: [],
     };
 
+
     reportError = (error) => {
         error = getErrorFromAxiosError(error);
         this.setState((state, props) => {
@@ -91,9 +93,22 @@ class GuideQuotes extends React.Component {
     onSubmit = (e) => {
         e.preventDefault();
         console.log("onSubmit: ", this.state);
-        //this.setState({selectedTab})
         let {name, phone, email, consent, seomake, seomodel} = this.state;
         phone = phone.replace(/[^0-9]/g, "");
+        let errors = validate({name, phone, email, consent});
+        console.log("errors: ", errors);
+        if (! _.isEmpty(errors)) {
+            console.log("got errors", errors);
+            let error_array = [];
+            for (let key in errors) {
+                error_array.push(errors[key]);
+            }
+            this.setState({errors: error_array});
+            return;
+        }
+        //this.setState({selectedTab})
+
+
         let data = {name, phone, email, consent, seomake, seomodel};
         console.log("submitting quote: ", data);
         axios.post(this.state.api_url + '/quotes', data).then((response) => {
@@ -127,7 +142,6 @@ class GuideQuotes extends React.Component {
                     email: this.props.user.user_email,
                     phone: this.props.user.phone
                 })
-
             }
         }
     }
@@ -229,9 +243,7 @@ class GuideQuotes extends React.Component {
                         <div className="request-guide-price-consent">
                             <label><input type="checkbox" name="consent" value={this.state.consent}
                                           onChange={this.handleChange} required="required"/> Consent<span> * </span> &nbsp; </label>
-                            By ticking this box you are agreeing that OSV Ltd can process and store the data that you
-                            have entered in this form - as well as any other information provided during our sales
-                            processes.
+                            By ticking this box you are agreeing that OSV Ltd can store and process the data that you have entered.
                         </div>
                         <div>
                             <div className="form-group">
@@ -251,14 +263,21 @@ const validate = values => {
       errors.name = "Please enter your name. ";
   }
     if (!values.phone) {
-        errors.name = "Please enter your phone. ";
+        errors.phone = "Please enter your phone. ";
+    }
+    if (values.phone[0] != '0') {
+        errors.phone = "Phone number must be a UK number and begin with 0. ";
+    }
+    if (values.phone.length !== 11) {
+        errors.phone = "Phone number must be a UK number, begin with 0 and be 11 digits long. ";
     }
     if (!values.email) {
-        errors.name = "Please enter your email. ";
+        errors.email = "Please enter your email. ";
     }
     if (!values.consent) {
         errors.consent = "Please check the box to confirm consent. ";
     }
+    return errors;
 };
 
 const mapStateToProps = (state) => {

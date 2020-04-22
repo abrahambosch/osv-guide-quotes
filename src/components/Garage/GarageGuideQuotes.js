@@ -40,7 +40,7 @@ class GarageGuideQuotes extends React.Component {
                 console.log("here are the items destructured", name, monthly_price,contract_term, expiration);
                 return (<tr key={i}>
                     <td>{name}</td>
-                    <td>{monthly_price}</td>
+                    <td>£{monthly_price}</td>
                     <td>{contract_term}</td>
                     <td>{expiration}</td>
                     <td>
@@ -68,7 +68,7 @@ class GarageGuideQuotes extends React.Component {
                 <tr>
                     <th>Vehicle</th>
                     <th>Monthly Price</th>
-                    <th>Contract Type</th>
+                    <th>Contract Length</th>
                     <th>Expiry Date</th>
                     <th></th>
                     <th></th>

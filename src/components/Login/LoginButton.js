@@ -11,7 +11,7 @@ class LoginButton extends React.Component {
     }
     render() {
         let className = ' ' + (this.state.showForm?"":"hidden");
-        let txt = this.props.auth.user?"Logout":"Login";
+        let txt = this.props.auth.user?"Garage Logout":"Garage Login";
         return <div className="osv-login-button-wrapper">
             <button className="osv-login-button btn btn-primary" onClick={this.toggle}>{txt}</button>
             <div className={className}>

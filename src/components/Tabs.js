@@ -1,5 +1,11 @@
 import React from 'react';
-
+/*
+<Tabs>
+    <Tab label={"Guide Quotes"}><GarageGuideQuotes /></Tab>
+    <Tab label={"Official Quotes"}><GarageOfficialQuotes /></Tab>
+    <Tab label={"My Account"}><GarageMyAccount /></Tab>
+</Tabs>
+ */
 export class Tabs extends React.Component {
 
     constructor(props) {

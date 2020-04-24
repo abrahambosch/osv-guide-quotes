@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { createUser, createGarageItem, requestCallback, attemptLogin } from '../../actions';
-
+import {Form, Field} from 'react-final-form';
 
 let api_url = "https://api.osv.ltd.uk";
 if (window.location.hostname === 'localhost' || window.location.hostname === 'staging.osv.ltd.uk') {
@@ -11,6 +11,7 @@ if (window.location.hostname === 'localhost' || window.location.hostname === 'st
 function formatErrors(obj) {
     let items = [];
     let i = 0;
+    if (typeof obj === 'string') return obj;
     for (const n in obj) {
         let v = arrayToString(obj[n]);
         items.push(<div key={i}><b>{n}:</b> {v}</div>);
@@ -86,20 +87,25 @@ class GuideQuotesPrice extends React.Component {
         this.setState({errors});
     };
 
-    onSubmitLoginUser = (e) => {
-        e.preventDefault();
-        let { email, password } = this.state;
+    onSubmitLoginUser = (formValues) => {
+        let { email, password } = formValues;
+        this.setState({ email, password });
         this.props.attemptLogin(email, password, (error, user) => {
-           if (!error && user) {
+            if (error !== null) {
+                console.error('got an error', error);
+                this.setState({errors: [...this.state.errors, error]})
+            }
+            else if (user) {
                this.addToGarage(user);
-           }
+            }
         });
     }
-    onSubmitCreateUser = (e) => {
-        e.preventDefault();
-        console.log("onSubmit: ", this.state);
+    onSubmitCreateUser = (formValues) => {
+        console.log("onSubmit: ", this.state, formValues);
         //this.setState({selectedTab})
-        let {name, phone, email, password} = this.state;
+        let { name, phone, email } = this.state;
+        let { password } = formValues;
+        this.setState({password});
         let name_arr = name.split(" ").filter(item => item.length);
         let first_name = name_arr.shift();
         let last_name = name_arr.join(" ");
@@ -107,7 +113,13 @@ class GuideQuotesPrice extends React.Component {
         phone = phone.replace(/[^0-9]/g, "");
         this.props.createUser(first_name, last_name, phone, email, password, (error, user) =>{
             console.log("created a user. ", user);
-            this.addToGarage(user);
+            if (error !== null) {
+                console.error('got an error', error);
+                this.setState({errors: [...this.state.errors, error]})
+            }
+            else if (user) {
+                this.addToGarage(user);
+            }
         });
     };
 
@@ -205,49 +217,98 @@ class GuideQuotesPrice extends React.Component {
                     <div className="guide-price-body">
                         Based on {nf(rateBook.mileage)} miles per year<br/>
                         £{nf(rateBook.initial_payment)} + VAT initial payment<br/>
-                        {rateBook.contract_term} month contract<br/>
-
+                        {rateBook.contract_term} month contract *<br/>
+                        {rateBook.contract_type}
+                    </div>
+                    <div>
+                        {errors}
                     </div>
                     {(this.state.saveToGarageButtonClicked && !this.props.user) && (
                         <div>
                             {(this.state.showPasswordForm) && (
-                            <form onSubmit={this.onSubmitCreateUser}>
-                                <div className="form-group">
-                                    <label>Please create a password:</label>
-                                    <input type="password" name="password" value={this.state.password}
-                                           onChange={this.handleChange}/>
-                                </div>
-                                <div className="form-group">
-                                    <label>Please confirm a password:</label>
-                                    <input type="password" name="passwordConfirm" value={this.state.passwordConfirm}
-                                           onChange={this.handleChange}/>
-                                </div>
-                                <div>
-                                    <button type="submit" className="btn">Create Garage</button>
-                                </div>
-                            </form>)}
+                                <fieldset>
+                                    <h3> Enter a password to setup your garage</h3>
+                                    <Form
+                                        onSubmit={this.onSubmitCreateUser} validate={validateCreateUser}
+                                        render={({submitError, handleSubmit, form, submitting, pristine, values}) => (
+                                            <form id="login" action="login" method="post" onSubmit={handleSubmit}>
+                                                <div>
+                                                    <Field name="password">
+                                                        {({input, meta}) => (
+                                                            <div className="form-group">
+                                                                <input {...input} type="password" placeholder="Password" className="form-control"/>
+                                                                {(meta.error || meta.submitError) && meta.touched && (
+                                                                    <div className="red">{meta.error || meta.submitError}</div>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </Field>
+                                                </div>
+                                                <div>
+                                                    <Field name="passwordverify">
+                                                        {({input, meta}) => (
+                                                            <div className="form-group">
+                                                                <input {...input} type="password" placeholder="Verify your Password" className="form-control"/>
+                                                                {(meta.error || meta.submitError) && meta.touched && (
+                                                                    <div className="red">{meta.error || meta.submitError}</div>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </Field>
+                                                </div>
+                                                <div>
+                                                    <button type="submit" className="btn">Create Garage</button>
+                                                </div>
+                                                {submitError && <div className="error">{submitError}</div>}
+                                            </form> )}
+                                    />
+                                    <div>
+                                        <a onClick={e=>this.setState({showPasswordForm:false})}>Click here to login. </a>
+                                    </div>
+                                </fieldset>
+                            )}
 
                             {(!this.state.showPasswordForm) && (
-                                <div>
-                                    <form onSubmit={this.onSubmitLoginUser}>
-                                        <div className="form-group">
-                                            <label>Email:</label>
-                                            <input type="text" name="email" value={this.state.email}
-                                            onChange={this.handleChange}/>
-                                        </div>
-                                        <div className="form-group">
-                                            <label>Password:</label>
-                                            <input type="password" name="password" value={this.state.password}
-                                            onChange={this.handleChange}/>
-                                        </div>
-                                        <div>
-                                            <button type="submit" className="btn">Login</button>
-                                        </div>
-                                    </form>
+                                <fieldset>
+                                    <h3>Login to add this vehicle to your garage</h3>
+                                    <Form
+                                        onSubmit={this.onSubmitLoginUser} validate={validateLogin}
+                                        render={({submitError, handleSubmit, form, submitting, pristine, values}) => (
+                                            <form id="login" action="login" method="post" onSubmit={handleSubmit}>
+                                                <div>
+                                                    <Field name="email">
+                                                        {({input, meta}) => (
+                                                            <div className="form-group">
+                                                                <input {...input} type="text" placeholder="Email" className="form-control"/>
+                                                                {(meta.error || meta.submitError) && meta.touched && (
+                                                                    <div className="red">{meta.error || meta.submitError}</div>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </Field>
+                                                </div>
+                                                <div>
+                                                    <Field name="password">
+                                                        {({input, meta}) => (
+                                                            <div className="form-group">
+                                                                <input {...input} type="password" placeholder="Password" className="form-control"/>
+                                                                {(meta.error || meta.submitError) && meta.touched && (
+                                                                    <div className="red">{meta.error || meta.submitError}</div>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </Field>
+                                                </div>
+                                                <div>
+                                                    <button type="submit" className="btn">Login</button>
+                                                </div>
+                                                {submitError && <div className="error">{submitError}</div>}
+                                            </form> )}
+                                    />
                                     <div>
-                                        <a onClick={e=>this.setState({showPasswordForm:true})}>Click Here to Create an account. </a>
+                                        <a onClick={e=>this.setState({showPasswordForm:true})}>Click here to create an account. </a>
                                     </div>
-                                </div>
+                                </fieldset>
                             )}
                         </div>
                     )}
@@ -259,7 +320,7 @@ class GuideQuotesPrice extends React.Component {
 
                     {this.props.user && <div>
                         <div>
-                            Contract terms including mileage, initial payments and contract length can be tailored to your requirements.
+                            Contract terms including mileage, initial payments and contract length can be tailored to your requirements. *
                         </div>
                         {!this.state.requestCallbackReceived && <div>
                             <button className="btn" onClick={this.requestOfficialQuote}>Request a Callback</button>
@@ -283,6 +344,31 @@ class GuideQuotesPrice extends React.Component {
         );
     }
 }
+
+const validateLogin = values => {
+    let errors = {};
+    if (!values.email) {
+        errors.email = "Please enter your email. ";
+    }
+    if (!values.password) {
+        errors.password = "Please enter a password. ";
+    }
+    return errors;
+};
+
+const validateCreateUser = values => {
+    let errors = {};
+    if (!values.password) {
+        errors.email = "Please enter your password. ";
+    }
+    if (!values.passwordverify) {
+        errors.passwordverify = "Please enter the same password as above. ";
+    }
+    else if (values.password != values.passwordverify) {
+        errors.passwordverify = "Please enter the same password as above. ";
+    }
+    return errors;
+};
 
 const mapStateToProps = (state) => {
     return {

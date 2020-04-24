@@ -12,23 +12,23 @@ const GuidePrice = (props) => {
     const rateBook = props.guideQuote.rate_book;
     return <div className="guide-price">
         <div className="guide-price-box">
-            <h2>Guide Price</h2>
+            <h2>Prices from</h2>
             <div className={"guide-price-price"}>
-                £{nf(rateBook.monthly_price)} + VAT * per month
+                £{nf(rateBook.monthly_price)} + VAT per month *
             </div>
             <div className="guide-price-body">
-                Based on {nf(rateBook.mileage)} per year<br/>
+                Based on {nf(rateBook.mileage)} miles per year<br/>
                 £{nf(rateBook.initial_payment)} + VAT initial payment<br/>
-                {rateBook.contract_length} month contract<br/>
-                {rateBook.contract_term}
+                {rateBook.contract_term} month contract<br/>
+                {rateBook.contract_type}
             </div>
-            <div>
+            <div className="guide-price-official-quote">
                 Want an official quote?
             </div>
             <div>
-                <button className="btn" onClick={props.onClickRequestCallback}>Request a call back</button>
+                <button className="btn" onClick={props.onClickRequestCallback}>Request an official quote</button>
             </div>
-            <div className="small">*pricing is subject to availability. T&amp;C's and the above contract conditions
+            <div className="small">* pricing subject to availability. <a href="/conditions">T&Cs</a>
             </div>
         </div>
     </div>;
@@ -37,7 +37,7 @@ const GuidePrice = (props) => {
 class RequestCallbackForm extends React.Component {
     state = {
         name: this.props.user?this.props.user.display_name:"",
-        phone: ""
+        phone: this.props.user?this.props.user.phone:"",
     };
 
     onSubmit = () => {
@@ -55,14 +55,12 @@ class RequestCallbackForm extends React.Component {
     render() {
         return <div className="guide-price">
             <div className="guide-price-box">
-                <h2>Talk to a Vehicle Specialist</h2>
-                <p>Request a callback from one of our vehicle specialists
-                    who will be able to talk through the offer and
-                    any amends you would like to make and provide you with an official quote. </p>
+                <h2>You’re just a short call away from a great offer</h2>
+                <p>Request a call back and one of our vehicle specialists will call you back to discuss your specific requirements and provide you with an official quote. </p>
 
                 <div className="guide-price-body">
                     {this.props.requestCallbackFormReceived && (
-                        <div><h3>Thank you, your official quote request has been received. One of our vehicle specialists will be calling you within 24 hours.</h3></div>
+                        <div><h3>Thank you, your official quote request has been received. One of our vehicle specialists will be calling you within 1 working day.</h3></div>
                     )}
                     {!this.props.requestCallbackFormReceived && (
                     <form onSubmit={this.onSubmit}>
@@ -80,8 +78,7 @@ class RequestCallbackForm extends React.Component {
                     </form>
                     )}
                 </div>
-                <div className="small">*pricing is subject to availability. T&amp;C's and the above contract
-                    conditions
+                <div className="small">* subject to <a href="/conditions" target="_blank">T&amp;C's</a>
                 </div>
             </div>
         </div>;

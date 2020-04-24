@@ -22,6 +22,11 @@ class GarageGuideQuotes extends React.Component {
     viewGarageItem(item) {
         console.log("viewGarageItem", item);
         this.props.selectGarageGuideQuote(item);
+        window.scrollTo({
+            top: 100,
+            left: 0,
+            behavior: 'smooth'
+        });
     }
     removeGarageItem(item) {
         console.log("removeGarageItem", item);
@@ -36,12 +41,13 @@ class GarageGuideQuotes extends React.Component {
         if (this.props.garageGuideQuotes.length) {
             rows = this.props.garageGuideQuotes.map((item, i) => {
                 console.log("looking at item: ", item);
-                const { name, monthly_price,contract_term, expiration } = item.rate_book;
+                const { name, monthly_price,contract_term, expiration, contract_type } = item.rate_book;
                 console.log("here are the items destructured", name, monthly_price,contract_term, expiration);
                 return (<tr key={i}>
                     <td>{name}</td>
-                    <td>£{monthly_price}</td>
-                    <td>{contract_term}</td>
+                    <td>£{monthly_price} + VAT</td>
+                    <td>{contract_term} months</td>
+                    <td>{contract_type}</td>
                     <td>{expiration}</td>
                     <td>
                         <button onClick={e => this.viewGarageItem(item)} className="btn">View</button>
@@ -69,6 +75,7 @@ class GarageGuideQuotes extends React.Component {
                     <th>Vehicle</th>
                     <th>Monthly Price</th>
                     <th>Contract Length</th>
+                    <th>Contract Type</th>
                     <th>Expiry Date</th>
                     <th></th>
                     <th></th>

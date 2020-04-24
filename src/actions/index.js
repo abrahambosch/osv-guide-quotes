@@ -144,11 +144,19 @@ export const createUser = (first_name, last_name, phone, email, password, callba
         }
 
     }).catch(error => {
+        if (error.response) {
+            if (error.response.data && error.response.data.error) {
+                error = error.response.data.error;
+            }
+        }
+        else {
+            error = "Invalid username or password. "
+        }
         dispatch({
             type: CREATE_USER_FAILURE,
-            payload: 'Create User failed: ' + error
+            payload: error
         });
-        if (callback) callback('Create User failed: ' + error);
+        if (callback) callback(error);
     });
 };
 

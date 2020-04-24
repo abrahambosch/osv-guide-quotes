@@ -134,6 +134,7 @@ class RateBookEdit extends React.Component {
             rateBook.monthly_price = o.monthly_price;
             rateBook.initial_payment = o.initial_payment;
             rateBook.contract_length = o.contract_length;
+            rateBook.contract_type = o.contract_type;
             rateBook.contract_term = o.contract_term;
             rateBook.mileage = o.mileage;
             rateBook.expiration = o.expiration;
@@ -246,7 +247,6 @@ class RateBookEdit extends React.Component {
 
 
         return (<div>
-            <h1>RateBook</h1>
             <div id="edit-book">
                 <form name="edit_book">
                     <div className="row">
@@ -317,10 +317,10 @@ class RateBookEdit extends React.Component {
                         </div>
                         <div className="col-md-4">
                             <div className="form-group">
-                                <label>Contract Length</label>
+                                <label>Contract Type</label>
                                 <input
-                                    name="contract_length"
-                                    value={this.state.rateBook.contract_length}
+                                    name="contract_type"
+                                    value={this.state.rateBook.contract_type}
                                     onChange={this.handleChange}
                                     className="form-control"
                                 />
@@ -336,7 +336,7 @@ class RateBookEdit extends React.Component {
                         </div>
                         <div className="col-md-4">
                             <div className="form-group">
-                                <label>Contract Type</label>
+                                <label>Contract Length</label>
                                 <input
                                     name="contract_term"
                                     value={this.state.rateBook.contract_term}
@@ -386,6 +386,7 @@ class RateBookEdit extends React.Component {
                                     onChange={this.handleChange}
                                 /> Active</label>
                             </div>
+
                         </div>
                     </div>
 

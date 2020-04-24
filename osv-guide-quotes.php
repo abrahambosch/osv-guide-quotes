@@ -484,7 +484,7 @@ Your login details are as follows:
 
 Email: $email
 
-You can update or change your password here: https://www.osv.ltd.uk/garage/#/account
+You can update or change your password here: https://www.osv.ltd.uk/wp-admin/profile.php
 
 In your garage you will be able to:
 Save cars you have browsed on the website

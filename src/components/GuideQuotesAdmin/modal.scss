@@ -1,3 +1,8 @@
 .modal-wrapper-visible .modal{
   display: block;
 }
+
+.modal-wrapper-visible .modal-title {
+  font-size: 30px;
+  float: left;
+}

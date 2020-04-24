@@ -31,6 +31,18 @@ label {
   margin-bottom: 20px;
 }
 
+.guide-price .guide-price-box h2 {
+  margin-bottom: 15px;
+}
+
+.guide-price .guide-price-official-quote {
+  font-size: 16px;
+}
+
+.guide-price-body {
+  margin-bottom: 20px;
+}
+
 .guide-price .guide-price-box {
   background-color: #EBEBEB;
   padding: 20px;
@@ -151,9 +163,16 @@ form .red{
   text-transform: none;
 }
 
+.request-guide-price-consent span {
+  font-size: 11px;
+}
+
 .request-guide-price-consent label, .request-guide-price-consent input[type=checkbox], .osv-register-form input[type=checkbox] {
   display: inline-block;
   width: auto !important;
+}
+.request-guide-price-consent label {
+  font-weight: normal;
 }
 
 .request-guide-price {

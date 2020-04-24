@@ -13,6 +13,7 @@ class RateBookList extends React.Component {
                 <td>£{item.monthly_price}</td>
                 <td>£{item.initial_payment}</td>
                 <td>{item.contract_term}</td>
+                <td>{item.contract_type}</td>
                 <td>{item.mileage}</td>
                 <td>{item.expiration.substr(0,10)}</td>
                 <td><button className="btn btn-xs btn-info" onClick={e=>this.props.onClickEditRateBook(item)}>Edit</button></td>
@@ -27,6 +28,7 @@ class RateBookList extends React.Component {
                     <th>Monthly price</th>
                     <th>Initial Payment</th>
                     <th>Contract Length</th>
+                    <th>Contract Type</th>
                     <th>Mileage</th>
                     <th>Expiry</th>
                     <th><td><button className="btn btn-xs btn-primary" onClick={e=>this.props.onClickNewRateBook({book_type: this.props.bookType})}>New</button></td></th>

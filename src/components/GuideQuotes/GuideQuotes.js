@@ -1,4 +1,5 @@
 import React from 'react';
+import {Form, Field} from 'react-final-form';
 import axios from 'axios';
 import GuideQuotesPrice from "./GuideQuotesPrice";
 import { connect } from 'react-redux';
@@ -73,6 +74,7 @@ class GuideQuotes extends React.Component {
     };
 
 
+
     reportError = (error) => {
         error = getErrorFromAxiosError(error);
         this.setState((state, props) => {
@@ -90,24 +92,34 @@ class GuideQuotes extends React.Component {
         this.setState({errors});
     }
 
-    onSubmit = (e) => {
-        e.preventDefault();
-        console.log("onSubmit: ", this.state);
-        let {name, phone, email, consent, seomake, seomodel} = this.state;
-        phone = phone.replace(/[^0-9]/g, "");
-        let errors = validate({name, phone, email, consent});
-        console.log("errors: ", errors);
-        if (! _.isEmpty(errors)) {
-            console.log("got errors", errors);
-            let error_array = [];
-            for (let key in errors) {
-                error_array.push(errors[key]);
-            }
-            this.setState({errors: error_array});
-            return;
-        }
-        //this.setState({selectedTab})
+    renderInput = (formProps) => {
+        console.log("LoginForm renderInput formProps", formProps);
+        let errorMessage = null;
+        const className = `form-group ${formProps.meta.error && formProps.meta.touched ? 'error' : ''}`;
+        return (
+            <div className={className}>
+                <label>{formProps.label}</label>
+                <input {...formProps.input} className="form-control" placeholder={formProps.label}
+                       type={formProps.type}/>
+                {this.renderError(formProps.meta)}
+            </div>
+        );
+    }
 
+    renderError({error, touched}) {
+        if (touched && error) {
+            return <div className="ui error message">
+                {error}
+            </div>
+        }
+    }
+
+    onSubmit = (formValues) => {
+        console.log("onSubmit: ", formValues);
+        let { name, phone, email, consent } = formValues;
+        let { seomake, seomodel } = this.state;
+        phone = phone.replace(/[^0-9]/g, "");
+        this.setState({ name, phone, email, consent });
 
         let data = {name, phone, email, consent, seomake, seomodel};
         console.log("submitting quote: ", data);
@@ -209,48 +221,74 @@ class GuideQuotes extends React.Component {
                     <h2>Want this car at a great price?</h2>
                     <p>Submit your details below for our pricing information. </p>
                     {errors}
-                    <form onSubmit={this.onSubmit}>
+                    <Form
+                        onSubmit={this.onSubmit} validate={validate}
+                        render={({submitError, handleSubmit, form, submitting, pristine, values}) => (
+                            <form id="login" action="login" method="post" onSubmit={handleSubmit}>
                         <div>
-                            <div className="form-group">
-                                <input className="form-control"
-                                       type="text"
-                                       name="name"
-                                       value={this.state.name}
-                                       onChange={this.handleChange}
-                                       placeholder="Name"/>
-                            </div>
-                        </div>
-                        <div>
-                            <div className="form-group">
-                                <input className="form-control"
-                                       type="phone"
-                                       name="phone"
-                                       value={this.state.phone}
-                                       onChange={this.handleChange}
-                                       placeholder="UK Phone Number"/>
-                            </div>
+                            <Field name="name">
+                                {({input, meta}) => (
+                                    <div className="form-group">
+                                        <input {...input} type="text" placeholder="Name" className="form-control"/>
+                                        {(meta.error || meta.submitError) && meta.touched && (
+                                            <div className="red">{meta.error || meta.submitError}</div>
+                                        )}
+                                    </div>
+                                )}
+                            </Field>
                         </div>
                         <div>
-                            <div className="form-group">
-                                <input className="form-control"
-                                       type="email"
-                                       name="email"
-                                       value={this.state.email}
-                                       onChange={this.handleChange}
-                                       placeholder="Email"/>
-                            </div>
+                            <Field name="phone">
+                                {({input, meta}) => (
+                                    <div className="form-group">
+                                        <input {...input} type="phone" placeholder="UK Phone Number" className="form-control"/>
+                                        {(meta.error || meta.submitError) && meta.touched && (
+                                            <div className="red">{meta.error || meta.submitError}</div>
+                                        )}
+                                    </div>
+                                )}
+                            </Field>
                         </div>
-                        <div className="request-guide-price-consent">
-                            <label><input type="checkbox" name="consent" value={this.state.consent}
-                                          onChange={this.handleChange} required="required"/> Consent<span> * </span> &nbsp; </label>
-                            By ticking this box you are agreeing that OSV Ltd can store and process the data that you have entered.
+                        <div>
+                            <Field name="email">
+                                {({input, meta}) => (
+                                    <div className="form-group">
+                                        <input {...input} type="email" placeholder="Email" className="form-control"/>
+                                        {(meta.error || meta.submitError) && meta.touched && (
+                                            <div className="red">{meta.error || meta.submitError}</div>
+                                        )}
+                                    </div>
+                                )}
+                            </Field>
                         </div>
+                        <Field name="uk_confirmation">
+                            {({input, meta}) => (
+                                <div className="request-guide-price-consent">
+                                    <label><input {...input} type="checkbox" required="required"/> I am in the UK. </label>
+                                    {(meta.error || meta.submitError) && meta.touched && (
+                                        <div className="red">{meta.error || meta.submitError}</div>
+                                    )}
+                                </div>
+                            )}
+                        </Field>
+                        <Field name="consent">
+                            {({input, meta}) => (
+                                <div className="request-guide-price-consent">
+                                    <label><input {...input} type="checkbox" /> Consent<span> * </span> &nbsp; </label>
+                                    <span>By ticking this box you are agreeing that OSV Ltd can store and process the data that you have entered.</span>
+                                    {(meta.error || meta.submitError) && meta.touched && (
+                                        <div className="red">{meta.error || meta.submitError}</div>
+                                    )}
+                                </div>
+                            )}
+                        </Field>
                         <div>
                             <div className="form-group">
                                 <input type="submit" className="btn" value="Request price information"/>
                             </div>
+                            {submitError && <div className="error">{submitError}</div>}
                         </div>
-                    </form>
+                    </form> )} />
                 </div>
             );
         }
@@ -265,11 +303,11 @@ const validate = values => {
     if (!values.phone) {
         errors.phone = "Please enter your phone. ";
     }
-    if (values.phone[0] != '0') {
-        errors.phone = "Phone number must be a UK number and begin with 0. ";
+    else if (values.phone.toString()[0] != '0') {
+        errors.phone = "Must be a valid UK phone number. ";
     }
-    if (values.phone.length !== 11) {
-        errors.phone = "Phone number must be a UK number, begin with 0 and be 11 digits long. ";
+    else if (values.phone.length !== 11) {
+        errors.phone = "Must be a valid UK phone number. ";
     }
     if (!values.email) {
         errors.email = "Please enter your email. ";

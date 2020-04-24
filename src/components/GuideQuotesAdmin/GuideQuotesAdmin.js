@@ -92,6 +92,7 @@ class GuideQuotesAdmin extends React.Component {
         this.loadOverrides();
     }
     reloadLists() {
+        this.reloadSelectedRateBookUpload();
         this.loadSpecials(this.state.specialsListPage);
         this.loadOverrides(this.state.overridesListPage);
     }
@@ -209,6 +210,13 @@ class GuideQuotesAdmin extends React.Component {
         })
 
     }
+    reloadSelectedRateBookUpload = () => {
+        const { rateBooksUploadSelected, rateBooksUploadsPage } = this.state;
+        if (rateBooksUploadSelected) {
+            return this.loadRateBook(rateBooksUploadSelected.id, rateBooksUploadsPage);
+        }
+    };
+
     onClickedNewRateBookUpload() {
         this.setState({rateBookUploadModalShow: true});
     }
@@ -306,7 +314,7 @@ class GuideQuotesAdmin extends React.Component {
                 isOpen={this.state.editRateBookShow}
                 onClose={this.onCloseEditRateBookModal}
                 showFooter={false}
-                title={""}
+                title={"Rate Book"}
             >
                 <RateBookEdit
                     api_url={this.state.api_url}

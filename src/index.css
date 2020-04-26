@@ -207,3 +207,15 @@ form .red{
   cursor: default;
   text-decoration: none;
 }
+
+.position-relative {
+  position: relative;
+}
+
+.garage-guide-quote .special-offer-img {
+  position: absolute;
+  z-index: 999;
+  right: 90px;
+  width: 150px;
+  top: 0px;
+}

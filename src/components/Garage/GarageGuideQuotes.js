@@ -37,17 +37,27 @@ class GarageGuideQuotes extends React.Component {
     }
 
     render() {
+        const titleTxt = "BCH = Business Contract Hire\n" +
+            "PCH = Personal Contract Hire\n" +
+            "BOL = Business Operating Lease\n" +
+            "POL = Personal Operating Lease";
         let rows = null;
         if (this.props.garageGuideQuotes.length) {
             rows = this.props.garageGuideQuotes.map((item, i) => {
                 console.log("looking at item: ", item);
                 const { name, monthly_price,contract_term, expiration, contract_type } = item.rate_book;
                 console.log("here are the items destructured", name, monthly_price,contract_term, expiration);
+                let nameArr = name.split(" ").filter(item=>item!="");
+                let nameFormated = name;
+                if (nameArr[0] == nameArr[1]) {
+                    nameArr.shift();
+                    nameFormated = nameArr.join(' ');
+                }
                 return (<tr key={i}>
-                    <td>{name}</td>
+                    <td>{nameFormated}</td>
                     <td>£{monthly_price} + VAT</td>
                     <td>{contract_term} months</td>
-                    <td>{contract_type}</td>
+                    <td><div title={titleTxt}>{contract_type}</div></td>
                     <td>{expiration}</td>
                     <td>
                         <button onClick={e => this.viewGarageItem(item)} className="btn">View</button>

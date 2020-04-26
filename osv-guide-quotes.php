@@ -334,7 +334,7 @@ __THIS;
                 $user = wp_signon($info,
                     false);    // if user alreay exists, attempt to login with the username/password.
                 if (is_wp_error($user)) {
-                    throw (new OsvException("User Already exists. "))
+                    throw (new OsvException("A user with this email already exists. "))
                         ->setStatus("ERROR_USER_ALREADY_EXISTS")
                         ->setDetail($user->get_error_message());
                 } else {

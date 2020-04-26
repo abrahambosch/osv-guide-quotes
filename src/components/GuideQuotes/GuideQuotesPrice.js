@@ -159,9 +159,9 @@ class GuideQuotesPrice extends React.Component {
     };
 
     requestOfficialQuote = () => {
-        const { name, phone } = this.state;
+        const { name, phone, email } = this.state;
         const rate_books_id = this.props.rateBook.id;
-        this.props.requestCallback(name, phone, rate_books_id, (error, response) => {
+        this.props.requestCallback(name, phone, email, rate_books_id, (error, response) => {
             if (!error) {
                 this.setState({requestCallbackReceived: true});
             }
@@ -206,19 +206,22 @@ class GuideQuotesPrice extends React.Component {
             n = n.toLocaleString();
             return n;
         }
-
+        let titleTxt = "BCH = Business Contract Hire\n" +
+            "PCH = Personal Contract Hire\n" +
+            "BOL = Business Operating Lease\n" +
+            "POL = Personal Operating Lease";
         return (
             <div className="guide-price">
                 <div className="guide-price-box">
                     <h2>Prices from</h2>
                     <div className={"guide-price-price"}>
-                        £{nf(rateBook.monthly_price)} + VAT per month
+                        £{nf(rateBook.monthly_price)} + VAT per month *
                     </div>
                     <div className="guide-price-body">
                         Based on {nf(rateBook.mileage)} miles per year<br/>
                         £{nf(rateBook.initial_payment)} + VAT initial payment<br/>
                         {rateBook.contract_term} month contract *<br/>
-                        {rateBook.contract_type}
+                        <div title={titleTxt}>{rateBook.contract_type || 'BCH/PCH'}</div>
                     </div>
                     <div>
                         {errors}
@@ -316,11 +319,15 @@ class GuideQuotesPrice extends React.Component {
                         <a href="/garage" className="btn">See this in your garage</a>
                     )}
 
-
-
-                    {this.props.user && <div>
+                    {!this.state.saveToGarageButtonClicked && (
                         <div>
-                            Contract terms including mileage, initial payments and contract length can be tailored to your requirements. *
+                            <button className="btn" onClick={this.onClickSaveToGarage}>Save to my garage</button>
+                        </div>
+                    )}
+
+                    <div>
+                        <div>
+                            Contract terms including mileage, initial payments and contract length can be tailored to your requirements.
                         </div>
                         {!this.state.requestCallbackReceived && <div>
                             <button className="btn" onClick={this.requestOfficialQuote}>Request a Callback</button>
@@ -329,13 +336,9 @@ class GuideQuotesPrice extends React.Component {
                             <h3>Request Received. </h3>
                             A team member will be in contact with you.
                         </div>}
-                    </div>}
+                    </div>
 
-                    {!this.state.saveToGarageButtonClicked && (
-                        <div>
-                            <button className="btn" onClick={this.onClickSaveToGarage}>Save to my garage</button>
-                        </div>
-                    )}
+
                 </div>
                 <div className="small">* Please read our  <a href="https://www.osv.ltd.uk/conditions/" target="_blank">T&amp;Cs</a>
 

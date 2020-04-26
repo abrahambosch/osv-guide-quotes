@@ -5,7 +5,12 @@ class RateBookList extends React.Component {
     componentDidMount() {
 
     }
+
     render() {
+        const titleTxt = "BCH = Business Contract Hire\n" +
+            "PCH = Personal Contract Hire\n" +
+            "BOL = Business Operating Lease\n" +
+            "POL = Personal Operating Lease";
         let rateBookList = this.props.rateBookList;
         const trItems = rateBookList.map((item,index) => (
             <tr key={index}>
@@ -13,7 +18,7 @@ class RateBookList extends React.Component {
                 <td>£{item.monthly_price}</td>
                 <td>£{item.initial_payment}</td>
                 <td>{item.contract_term}</td>
-                <td>{item.contract_type}</td>
+                <td><div title={titleTxt}>{item.contract_type}</div></td>
                 <td>{item.mileage}</td>
                 <td>{item.expiration.substr(0,10)}</td>
                 <td><button className="btn btn-xs btn-info" onClick={e=>this.props.onClickEditRateBook(item)}>Edit</button></td>

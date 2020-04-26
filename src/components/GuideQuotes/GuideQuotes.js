@@ -216,12 +216,15 @@ class GuideQuotes extends React.Component {
             );
         }
         else {
+            const { name, email, phone } = this.state;
+            const initialValues = { name, email, phone };
             return (
                 <div className="request-guide-price">
                     <h2>Want this car at a great price?</h2>
                     <p>Submit your details below for our pricing information. </p>
                     {errors}
                     <Form
+                        initialValues={initialValues}
                         onSubmit={this.onSubmit} validate={validate}
                         render={({submitError, handleSubmit, form, submitting, pristine, values}) => (
                             <form id="login" action="login" method="post" onSubmit={handleSubmit}>

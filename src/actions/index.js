@@ -54,22 +54,25 @@ export const callbackRequests = () => async (dispatch, getState) => {
 };
 
 
-export const requestCallback = (name, phone, rate_books_id, callback) => async (dispatch, getState) => {
+export const requestCallback = (name, phone, email, rate_books_id, callback) => async (dispatch, getState) => {
     console.log("action getGarage");
-    const user_id = getState().auth.user.user_id;
+    const user_id = getState().auth.user?getState().auth.user.user_id:"";
     const apiurl = getState().auth.apiurl;
+    if (!email && getState().auth.user) email = getState().auth.user.user_email;
     const selectedGarageGuideQuote = getState().selectedGarageGuideQuote;
     if (selectedGarageGuideQuote) {
         rate_books_id = selectedGarageGuideQuote.rate_books_id;
     }
     const garage_items_id = selectedGarageGuideQuote?selectedGarageGuideQuote.id:'';
-    const url = apiurl + '/garages/' + user_id + '/callbackRequests';
+    const url = apiurl + '/callbackRequests';
     const config = {headers: {'Authorization': 'Bearer ' + getState().auth.authtoken}};
     await axios.post(url, {
         name,
         phone,
+        email,
         garage_items_id,
-        rate_books_id
+        rate_books_id,
+        user_id     // optional
     }, config).then(response => {
         dispatch({
             type: CALLBACK_REQUEST,

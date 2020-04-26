@@ -1,6 +1,7 @@
 import React from 'react';
 import {connect} from "react-redux";
 import { requestCallback } from '../../actions';
+import specialImage from '../../images/special-offer.png';
 
 function nf(n) {
     n = Math.floor(n);
@@ -91,6 +92,15 @@ class GarageGuideQuote extends React.Component {
         requestCallbackFormReceived: false,
     };
 
+    componentDidUpdate(prevProps) {
+        if (this.props.guideQuote !== prevProps.guideQuote) {
+            this.setState({
+                requestCallbackClicked: false,
+                requestCallbackFormReceived: false
+            });
+        }
+    }
+
     onSubmitRequestCallbackForm = (name, phone) => {
         this.props.requestCallback(name, phone);
         this.setState({ requestCallbackFormReceived: true});
@@ -111,6 +121,11 @@ class GarageGuideQuote extends React.Component {
             right = <GuidePrice guideQuote={q} onClickRequestCallback={this.onClickRequestCallback}/>;
         }
 
+        let special = "";
+        if (q.rate_book.book_type == 'SPECIAL') {
+            special = <img src={specialImage} className="special-offer-img" />;
+        }
+
         return (<div className="garage-guide-quote">
             <div className="row garage-guide-quote-top">
                 Guide Quotes > {q.rate_book.name}
@@ -119,7 +134,8 @@ class GarageGuideQuote extends React.Component {
                 </a>
             </div>
             <div className="row">
-                <div className="col-md-8">
+                <div className="col-md-8 position-relative">
+                    {special}
                     <img src={img} className="img-responsive"/>
                 </div>
                 <div className="col-md-4">
